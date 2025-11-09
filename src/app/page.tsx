@@ -1,65 +1,65 @@
-import Image from "next/image";
+import BackgroundCarousel from '@/components/BackgroundCarousel';
+import Footer from '@/components/Footer';
+import styles from '@/styles/home.module.scss';
+import Link from 'next/link';
 
-export default function Home() {
+export default function HomePage() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
+    <div className={styles.wrapper}>
+      <main className={styles.content}>
+        <BackgroundCarousel />
+        <div className={styles.scrim} aria-hidden="true" />
+
+        <header className={styles.content}>
+          <h1 className={styles.logo}>SbaJo</h1>
+          <p className={styles.tagline}>È il posto dove l’errore diventa stile</p>
+        </header>
+
+        <nav className={styles.iconGrid} aria-label="Sezioni principali">
+          <Link href="/menu-food" className={styles.appIcon}>
+            <svg viewBox="0 0 64 64" aria-hidden="true"><g fill="none" strokeWidth="2">
+              <rect x="8" y="28" width="48" height="10" rx="4" />
+              <path d="M10 26c3-8 41-8 44 0" />
+              <path d="M12 40h40M18 48h28" />
+            </g></svg>
+            <span>Menu food</span>
+          </Link>
+
+          <Link href="/menu-drink" className={styles.appIcon}>
+            <svg viewBox="0 0 64 64" aria-hidden="true"><g fill="none" strokeWidth="2">
+              <path d="M8 12h48L32 36 8 12z" />
+              <path d="M32 36v14" />
+              <path d="M22 50h20" />
+            </g></svg>
+            <span>Menu drink</span>
+          </Link>
+
+          <Link href="/eventi" className={styles.appIcon}>
+            <svg viewBox="0 0 64 64" aria-hidden="true"><g fill="none" strokeWidth="2">
+              <rect x="10" y="14" width="44" height="40" rx="4" />
+              <path d="M10 24h44" />
+              <path d="M20 10v8M44 10v8" />
+              <rect x="18" y="30" width="8" height="8" rx="2" />
+              <rect x="30" y="30" width="8" height="8" rx="2" />
+              <rect x="42" y="30" width="8" height="8" rx="2" />
+            </g></svg>
+            <span>Eventi</span>
+          </Link>
+
+          <Link href="/chi-siamo" className={styles.appIcon}>
+            <svg viewBox="0 0 64 64" aria-hidden="true"><g fill="none" strokeWidth="2">
+              <path d="M8 44h48" />
+              <path d="M14 44c0-10 8-18 18-18s18 8 18 18" />
+              <circle cx="32" cy="20" r="3" />
+            </g></svg>
+            <span>Chi siamo</span>
+          </Link>
+        </nav>
+
       </main>
+      <Footer />
+
+
     </div>
   );
 }
