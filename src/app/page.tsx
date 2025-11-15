@@ -6,7 +6,7 @@ import Link from 'next/link';
 export default function HomePage() {
   return (
     <div className={styles.wrapper}>
-      <main className={styles.contentMain}>
+      <main className={styles.main}>
         <BackgroundCarousel />
         <div className={styles.scrim} aria-hidden="true" />
 
