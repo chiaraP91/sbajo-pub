@@ -36,14 +36,46 @@ function PrenotaPage() {
     }
   }, [formData]); // Rilancia quando i dati del form cambiano
 
-  const buildWhatsappMessage = () => {
-    const { nome, cognome, numeroPersone, data, orario, note } = formData;
-    const messaggio = `Ciao! Sono ${nome} ${cognome}.\n\nVorrei prenotare ${numeroPersone} persone per il ${data} alle ${orario}.\n\n${note}`;
-    return encodeURIComponent(messaggio);
-  };
+ // Helper per formattare la data in modo più umano
+const formatDateIt = (dateStr: string) => {
+  if (!dateStr) return '';
+  const date = new Date(dateStr);
+  return date.toLocaleDateString('it-IT', {
+    weekday: 'long',
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric'
+  });
+};
+
+const buildWhatsappMessage = () => {
+  const { nome, cognome, numeroPersone, data, orario, note } = formData;
+
+  const personeLabel =
+    numeroPersone === '1' ? 'persona' : 'persone';
+
+  const dataFormattata = formatDateIt(data);
+
+  const noteSection = note
+    ? `\n\nNote (prometto che non sto esagerando):\n${note}`
+    : '';
+
+  const messaggio = `Ciao Sbajo! 🍻
+sono ${nome}${cognome ? ` ${cognome}` : ''}.
+
+Vorrei prenotare per ${numeroPersone} ${personeLabel} ${dataFormattata ? `per ${dataFormattata}` : `per il ${data}`} alle ${orario}.
+
+Se c’è posto, mi piacerebbe un angolino carino dove godermi la serata e sbajare con classe. 😄
+${noteSection}
+
+Attendo conferma per la prenotazione! ✨`;
+
+  return encodeURIComponent(messaggio);
+};
+
 
   const handlePrenotaClick = () => {
-    const numeroWhatsApp = '+39 331 883 1199';
+    const numeroWhatsApp = '+393316111547';
     const messaggio = buildWhatsappMessage();
     const url = `https://wa.me/${numeroWhatsApp}?text=${messaggio}`;
     window.open(url, '_blank');
