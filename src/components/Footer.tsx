@@ -7,7 +7,7 @@ export default function Footer() {
       <nav className={styles.footerNav}>
         <Link href="/prenota" className={styles.footerLink}>
           <img src="/assets/img/icona1.png" alt="Prenota" className={styles.footerIcon} />
-          <span>Prenota</span>
+          <span className='flex'>Prenota</span>
         </Link>
         <a
           href="https://maps.google.com/?q=SbaJo+Anzio"

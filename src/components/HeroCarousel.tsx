@@ -13,6 +13,12 @@ export default function HeroCarousel({ images }: { images: string[] }) {
     return () => clearInterval(interval);
   }, [images.length]);
 
+  //ref è un prop da usare al posto dello useEffect
+
+  //useState per rendere le variabili modificabili senza perderle al render
+
+  //prop. oggetto che passi al compenente (ad es. images è un prop)
+
   return (
     <div className={styles.hero}>
       {images.map((src, i) => (
