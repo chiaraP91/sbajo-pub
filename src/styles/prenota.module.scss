@@ -131,3 +131,60 @@ textarea.formInput {
   background-color: #888; 
   cursor: not-allowed;
 }
+
+
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+
+.modal {
+  background: #0a100e;
+  color: #d7b56d;
+  padding: 2rem;
+  border-radius: 14px;
+  width: 90%;
+  max-width: 380px;
+  text-align: center;
+  border: 1px solid rgba(215,181,109,0.3);
+}
+
+.modalButtons {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 1.5rem;
+}
+
+.modalPrimary,
+.modalSecondary,
+.modalCall {
+  padding: .8rem 1.2rem;
+  border-radius: 10px;
+  font-size: 1rem;
+  text-decoration: none;
+  cursor: pointer;
+  text-align: center;
+}
+
+.modalPrimary {
+  background: #d7b56d;
+  color: #0a100e;
+  font-weight: 600;
+}
+
+.modalSecondary {
+  background: transparent;
+  border: 1px solid #d7b56d;
+  color: #d7b56d;
+}
+
+.modalCall {
+  background: #0f6c3f;
+  color: white;
+}
