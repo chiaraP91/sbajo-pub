@@ -75,7 +75,7 @@ Attendo conferma per la prenotazione! ✨`;
 
 
   const handlePrenotaClick = () => {
-    const numeroWhatsApp = '+393316111547';
+    const numeroWhatsApp = '+393318831199';
     const messaggio = buildWhatsappMessage();
     const url = `https://wa.me/${numeroWhatsApp}?text=${messaggio}`;
     window.open(url, '_blank');
