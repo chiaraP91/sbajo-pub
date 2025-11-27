@@ -78,10 +78,6 @@
   font-size: clamp(44px, 10vw, 96px);
   line-height: 1;
   letter-spacing: .5px;
-<<<<<<< HEAD
-  text-shadow: 0 1px 0 rgba(0,0,0,.6), 0 8px 30px rgba(0,0,0,.6);
-=======
->>>>>>> master
   margin: 0 0 8px;
 }
 
@@ -122,20 +118,13 @@
   outline: 1px solid var(--ring);
   box-shadow: 0 10px 30px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.02);
   transition: transform .2s ease, outline-color .2s ease, background .2s ease;
-<<<<<<< HEAD
-=======
   max-width: 15rem;
->>>>>>> master
 }
 
 .appIcon:hover,
 .appIcon:focus-visible {
   transform: translateY(-2px);
   outline-color: $gold;
-<<<<<<< HEAD
-  background: rgba(0,0,0,.33);
-=======
->>>>>>> master
 }
 
 .appIcon svg {

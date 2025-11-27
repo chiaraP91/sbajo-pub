@@ -6,25 +6,16 @@ $gold: #d7b56d;
 $gold-strong: #e6c98c;
 
 .events {
-<<<<<<< HEAD
-  padding: 2.5rem 1.5rem 3.5rem;
-  background: $green-dark;
-  color: $gold;
-  font-family: "Spectral", serif;
-=======
   background: $green-dark;
   color: $gold;
   font-family: "Spectral", serif;
   background-image: url('../../public/assets/img/bruschini.jpg');
   background-size: cover;
->>>>>>> master
 }
 
 .eventsHeader {
   text-align: center;
   margin-bottom: 2.5rem;
-<<<<<<< HEAD
-=======
   border-bottom: 1px solid #d7b56d33;
   justify-content: space-between;
   align-items: center;
@@ -34,7 +25,6 @@ $gold-strong: #e6c98c;
   align-items: center;
   flex-direction: column;
   margin-top: 2rem;
->>>>>>> master
 }
 
 .eventsTitle {
@@ -42,14 +32,6 @@ $gold-strong: #e6c98c;
   margin-bottom: 0.8rem;
   font-weight: 600;
   color: $gold-strong;
-<<<<<<< HEAD
-}
-
-.eventsSubtitle {
-  font-size: 1.1rem;
-  line-height: 1.6;
-  opacity: 0.9;
-=======
   background-color: #000000d9;
   max-width: 60%;
   padding: 0.5rem 1rem;
@@ -62,19 +44,15 @@ $gold-strong: #e6c98c;
   background-color: #000000d9;
   max-width: 85%;
   padding: 0.5rem 1rem;
->>>>>>> master
 }
 
 .eventsList {
   display: flex;
   flex-direction: column;
   gap: 1.8rem;
-<<<<<<< HEAD
-=======
   padding-bottom: 2rem;
   justify-content: center;
   align-items: center;
->>>>>>> master
 }
 
 .eventCard {
@@ -83,10 +61,7 @@ $gold-strong: #e6c98c;
   border-radius: 18px;
   padding: 1.3rem;
   overflow: hidden;
-<<<<<<< HEAD
-=======
   max-width: 80%;
->>>>>>> master
 }
 
 .eventBorder {

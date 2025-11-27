@@ -52,26 +52,6 @@ function PrenotaPage() {
     const buildWhatsappMessage = () => {
         const { nome, cognome, numeroPersone, data, orario, note } = formData;
 
-<<<<<<< HEAD
-        const personeLabel =
-            numeroPersone === '1' ? 'persona' : 'persone';
-
-        const dataFormattata = formatDateIt(data);
-
-        const noteSection = note
-            ? `\n\nNote (prometto che non sto esagerando):\n${note}`
-            : '';
-
-        const messaggio = `Ciao Sbajo! 🍻
-            sono ${nome}${cognome ? ` ${cognome}` : ''}.
-
-            Vorrei prenotare per ${numeroPersone} ${personeLabel} ${dataFormattata ? `per ${dataFormattata}` : `per il ${data}`} alle ${orario}.
-
-            Se c’è posto, mi piacerebbe un angolino carino dove godermi la serata e sbajare con classe. 😄
-            ${noteSection}
-
-            Attendo conferma per la prenotazione! ✨`;
-=======
         const personeLabel = numeroPersone === '1' ? 'persona' : 'persone';
         const dataFormattata = formatDateIt(data);
 
@@ -81,7 +61,6 @@ function PrenotaPage() {
 data: ${dataFormattata || data}
 ora: ${orario}
 persone: ${numeroPersone} ${personeLabel}${noteSection}`;
->>>>>>> master
 
         return encodeURIComponent(messaggio);
     };
