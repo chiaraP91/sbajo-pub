@@ -1,5 +1,10 @@
 import React from "react";
 import styles from '@/styles/eventi.module.scss';
+<<<<<<< HEAD
+=======
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
+>>>>>>> master
 
 export type EventItem = {
   id: string | number;
@@ -44,6 +49,10 @@ const EventiPage: React.FC<EventsSectionProps> = ({ events }) => {
 
   return (
     <section className={styles.events}>
+<<<<<<< HEAD
+=======
+      <Header />
+>>>>>>> master
       <div className={styles.eventsHeader}>
         <h2 className={styles.eventsTitle}>Eventi Sbajati</h2>
         <p className={styles.eventsSubtitle}>
@@ -84,6 +93,10 @@ const EventiPage: React.FC<EventsSectionProps> = ({ events }) => {
           </article>
         ))}
       </div>
+<<<<<<< HEAD
+=======
+      <Footer />
+>>>>>>> master
     </section>
   );
 };
