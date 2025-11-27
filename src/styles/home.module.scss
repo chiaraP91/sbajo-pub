@@ -1,0 +1,145 @@
+@use './variables' as *;
+
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+  width: 100%;
+  background: $bg-dark;
+  color: $gold;
+  overflow: hidden;
+}
+
+.main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 24px 16px;
+  width: 100%;
+  box-sizing: border-box;
+  position: relative;
+  min-height: 100vh;
+
+}
+
+.hero {
+  position: relative;
+  min-height: 100dvh;
+  height: 100%;
+  background: $bg-dark;
+  color: $gold;
+  overflow: hidden;
+}
+
+.bgLayer {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  height: 120%;
+
+}
+
+.bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity 900ms ease, transform 6s ease;
+  transform: scale(1.05);
+  filter: saturate(.95) contrast(.95) brightness(.9);
+}
+
+.bg.active {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.scrim {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background:radial-gradient(120% 80% at 50% 100%, #00000038 0%, #00000038 70%), linear-gradient(to top, #0000003b 0, #0003 60%, #0000002e 100%);
+  backdrop-filter: blur(1px);
+}
+
+.content {
+  position: relative;
+  z-index: 2;
+  padding: 24px 16px 12px;
+  max-width: 1100px;
+}
+
+.logo {
+  font-family: 'Spectral', serif;
+  font-weight: 600;
+  font-size: clamp(44px, 10vw, 96px);
+  line-height: 1;
+  letter-spacing: .5px;
+  margin: 0 0 8px;
+}
+
+.tagline {
+  font-family: 'Spectral', serif;
+  font-size: clamp(16px, 2.5vw, 28px);
+  color: $gold-strong;
+  margin: 0 0 6dvh;
+}
+
+.iconGrid {
+  position: relative;
+  z-index: 2;
+  margin: 0 auto;
+  padding: 0 16px 8dvh;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(136px, 1fr));
+  gap: clamp(14px, 3vw, 28px);
+  max-width: 720px;
+
+ a {
+  color: inherit;
+  text-decoration: none;
+  padding: 0px;
+  margin: 0px;
+  box-shadow: none;
+}
+}
+
+.appIcon {
+  display: grid;
+  place-items: center;
+  gap: 10px;
+  text-decoration: none;
+  color: $gold;
+  padding: 18px 14px;
+  border-radius: 22px;
+  outline: 1px solid var(--ring);
+  box-shadow: 0 10px 30px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.02);
+  transition: transform .2s ease, outline-color .2s ease, background .2s ease;
+  max-width: 15rem;
+}
+
+.appIcon:hover,
+.appIcon:focus-visible {
+  transform: translateY(-2px);
+  outline-color: $gold;
+}
+
+.appIcon svg {
+  width: clamp(44px, 6vw, 64px);
+  height: clamp(44px, 6vw, 64px);
+  stroke: $gold;
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  filter: drop-shadow(0 2px 0 rgba(0,0,0,.4));
+}
+
+.appIcon span {
+  font-family: 'Spectral', serif;
+  font-size: clamp(13px, 1.8vw, 18px);
+  letter-spacing: .3px;
+}
+
