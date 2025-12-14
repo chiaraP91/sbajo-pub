@@ -1,237 +1,128 @@
-import styles from '@/styles/menu.module.scss';
-import Footer from '@/components/Footer';
-import Header from '@/components/Header';
-import HeroCarousel from '@/components/HeroCarousel';
+"use client";
 
-const foodImages = [
-    '/assets/img/drink1.png',
-    '/assets/img/drink2.png',
-    '/assets/img/drink3.png',
-    '/assets/img/drink4.png',
+import styles from "@/styles/menu.module.scss";
+import Footer from "@/components/Footer";
+import Header from "@/components/Header";
+import HeroCarousel from "@/components/HeroCarousel";
+import { useEffect, useMemo, useState } from "react";
+
+const drinkImages = [
+    "/assets/img/drink1.png",
+    "/assets/img/drink2.png",
+    "/assets/img/drink3.png",
+    "/assets/img/drink4.png",
 ];
 
+interface Drink {
+    id: number;
+    documentId: string;            // ✅ serve per anchor stabile
+    nome: string;
+    descrizione: string | null;
+    prezzo: number;
+    tipologia?: string;
 
+    coll_food?: string | null;     // ✅ documentId del food
+}
 
-export default function MenuFoodPage() {
+interface FoodMin {
+    id: number;
+    documentId: string;            // ✅
+    nome: string;
+}
+
+export default function MenuDrinkPage() {
+    const [drinks, setDrinks] = useState<Drink[] | null>(null);
+    const [food, setFood] = useState<FoodMin[] | null>(null);
+
+    useEffect(() => {
+        Promise.all([
+            fetch("https://supportive-flame-83924d0cf8.strapiapp.com/api/menu-drinks").then((r) => r.json()),
+            fetch("https://supportive-flame-83924d0cf8.strapiapp.com/api/menus").then((r) => r.json()),
+        ])
+            .then(([drinkRes, foodRes]) => {
+                setDrinks(drinkRes?.data ?? []);
+                setFood(foodRes?.data ?? []);
+            })
+            .catch(() => {
+                setDrinks([]);
+                setFood([]);
+            });
+    }, []);
+
+    // mappa documentId food -> food
+    const foodByDocumentId = useMemo(() => {
+        const map = new Map<string, FoodMin>();
+        (food ?? []).forEach((p) => map.set(p.documentId, p));
+        return map;
+    }, [food]);
+
+    // grouping per tipologia
+    const grouped = useMemo(() => {
+        return (drinks ?? []).reduce((acc, item) => {
+            const cat = item.tipologia?.toLowerCase().trim() || "altro";
+            (acc[cat] ??= []).push(item);
+            return acc;
+        }, {} as Record<string, Drink[]>);
+    }, [drinks]);
+
     return (
         <div className={styles.wrapper}>
-            <HeroCarousel images={foodImages} />
+            <HeroCarousel images={drinkImages} />
             <div className={styles.scrim} aria-hidden="true" />
 
             <Header />
+
             <main className={styles.scrollArea}>
+                {Object.keys(grouped).length === 0 ? (
+                    <p className={styles.empty}>Il menu drink non è disponibile al momento.</p>
+                ) : (
+                    Object.entries(grouped).map(([tipologia, items]) => (
+                        <section key={tipologia} id={tipologia}>
+                            <h2 className={styles.heading}>
+                                {tipologia.charAt(0).toUpperCase() + tipologia.slice(1)}
+                            </h2>
 
-                <section id="alcolici">
-                    <h2 className={styles.heading}>Alcolici</h2>
-                    <ul className={styles.list}>
-                        <li className={styles.item}>
-                            <div className={styles.details}>
-                                <h4 className={styles.nameItem}>Negroni <span className={styles.codes}>[12]</span></h4>
-                                <p>Gin, vermouth rosso, bitter</p>
-                            </div>
-                            <span className={styles.price}>€8</span>
-                        </li>
-                        <li className={styles.item}>
-                            <div className={styles.details}>
-                                <h4 className={styles.nameItem}>Spritz <span className={styles.codes}>[12]</span></h4>
-                                <p>Aperol, prosecco, soda</p>
-                            </div>
-                            <span className={styles.price}>€7</span>
-                        </li>
-                        <li className={styles.item}>
-                            <div className={styles.details}>
-                                <h4 className={styles.nameItem}>Moscow Mule <span className={styles.codes}>[12]</span></h4>
-                                <p>Vodka, ginger beer, lime</p>
-                            </div>
-                            <span className={styles.price}>€9</span>
-                        </li>
-                        <li className={styles.item}>
-                            <div className={styles.details}>
-                                <h4 className={styles.nameItem}>Gin Tonic <span className={styles.codes}>[12]</span></h4>
-                                <p>Gin premium, acqua tonica</p>
-                            </div>
-                            <span className={styles.price}>€8</span>
-                        </li>
-                        <li className={styles.item}>
-                            <div className={styles.details}>
-                                <h4 className={styles.nameItem}>Rum & Cola <span className={styles.codes}>[12]</span></h4>
-                                <p>Rum scuro, cola</p>
-                            </div>
-                            <span className={styles.price}>€7</span>
-                        </li>
-                    </ul>
-                </section>
-                <section id="analcolici">
-                    <h2 className={styles.heading}>Analcolici</h2>
-                    <ul className={styles.list}>
-                        <li className={styles.item}>
-                            <div className={styles.details}>
-                                <h4 className={styles.nameItem}>Mocktail Tropicale <span className={styles.codes}>[6]</span></h4>
-                                <p>Succo d’ananas, lime, menta</p>
-                            </div>
-                            <span className={styles.price}>€6</span>
-                        </li>
-                        <li className={styles.item}>
-                            <div className={styles.details}>
-                                <h4 className={styles.nameItem}>Virgin Mojito <span className={styles.codes}>[6]</span></h4>
-                                <p>Lime, menta, zucchero, soda</p>
-                            </div>
-                            <span className={styles.price}>€6</span>
-                        </li>
-                        <li className={styles.item}>
-                            <div className={styles.details}>
-                                <h4 className={styles.nameItem}>Frullato Mango <span className={styles.codes}>[7]</span></h4>
-                                <p>Mango fresco, yogurt, miele</p>
-                            </div>
-                            <span className={styles.price}>€5</span>
-                        </li>
-                        <li className={styles.item}>
-                            <div className={styles.details}>
-                                <h4 className={styles.nameItem}>Succo ACE <span className={styles.codes}>-</span></h4>
-                                <p>Arancia, carota, limone</p>
-                            </div>
-                            <span className={styles.price}>€4</span>
-                        </li>
-                        <li className={styles.item}>
-                            <div className={styles.details}>
-                                <h4 className={styles.nameItem}>Tè freddo alla pesca <span className={styles.codes}>-</span></h4>
-                                <p>Infuso naturale, ghiaccio</p>
-                            </div>
-                            <span className={styles.price}>€4</span>
-                        </li>
-                    </ul>
-                </section>
-                <section id="soft">
-                    <h2 className={styles.heading}>Soft Drink</h2>
-                    <ul className={styles.list}>
-                        <li className={styles.item}>
-                            <div className={styles.details}>
-                                <h4 className={styles.nameItem}>Coca-Cola <span className={styles.codes}>-</span></h4>
-                                <p>Classica o Zero</p>
-                            </div>
-                            <span className={styles.price}>€3</span>
-                        </li>
-                        <li className={styles.item}>
-                            <div className={styles.details}>
-                                <h4 className={styles.nameItem}>Fanta <span className={styles.codes}>-</span></h4>
-                                <p>Arancia o limone</p>
-                            </div>
-                            <span className={styles.price}>€3</span>
-                        </li>
-                        <li className={styles.item}>
-                            <div className={styles.details}>
-                                <h4 className={styles.nameItem}>Sprite <span className={styles.codes}>-</span></h4>
-                                <p>Bevanda al limone</p>
-                            </div>
-                            <span className={styles.price}>€3</span>
-                        </li>
-                        <li className={styles.item}>
-                            <div className={styles.details}>
-                                <h4 className={styles.nameItem}>Acqua naturale <span className={styles.codes}>-</span></h4>
-                                <p>Bottiglia 50cl</p>
-                            </div>
-                            <span className={styles.price}>€2</span>
-                        </li>
-                        <li className={styles.item}>
-                            <div className={styles.details}>
-                                <h4 className={styles.nameItem}>Acqua frizzante <span className={styles.codes}>-</span></h4>
-                                <p>Bottiglia 50cl</p>
-                            </div>
-                            <span className={styles.price}>€2</span>
-                        </li>
-                    </ul>
-                </section>
-                <section id="vino">
-                    <h2 className={styles.heading}>Vino</h2>
-                    <ul className={styles.list}>
-                        <li className={styles.item}>
-                            <div className={styles.details}>
-                                <h4 className={styles.nameItem}>Prosecco DOC <span className={styles.codes}>[12]</span></h4>
-                                <p>Bollicine fresche, note fruttate</p>
-                            </div>
-                            <span className={styles.price}>€5</span>
-                        </li>
-                        <li className={styles.item}>
-                            <div className={styles.details}>
-                                <h4 className={styles.nameItem}>Chardonnay <span className={styles.codes}>[12]</span></h4>
-                                <p>Bianco secco, aroma floreale</p>
-                            </div>
-                            <span className={styles.price}>€6</span>
-                        </li>
-                        <li className={styles.item}>
-                            <div className={styles.details}>
-                                <h4 className={styles.nameItem}>Rosso Montepulciano <span className={styles.codes}>[12]</span></h4>
-                                <p>Corposo, note di frutti rossi</p>
-                            </div>
-                            <span className={styles.price}>€6</span>
-                        </li>
-                        <li className={styles.item}>
-                            <div className={styles.details}>
-                                <h4 className={styles.nameItem}>Rosé frizzante <span className={styles.codes}>[12]</span></h4>
-                                <p>Delicato, fresco, leggermente dolce</p>
-                            </div>
-                            <span className={styles.price}>€5</span>
-                        </li>
-                        <li className={styles.item}>
-                            <div className={styles.details}>
-                                <h4 className={styles.nameItem}>Vino della casa <span className={styles.codes}>[12]</span></h4>
-                                <p>Bianco o rosso, calice</p>
-                            </div>
-                            <span className={styles.price}>€4</span>
-                        </li>
-                    </ul>
-                </section>
-                <section id="birra">
-                    <h2 className={styles.heading}>Birra</h2>
-                    <ul className={styles.list}>
-                        <li className={styles.item}>
-                            <div className={styles.details}>
-                                <h4 className={styles.nameItem}>Birra chiara <span className={styles.codes}>[1, 12]</span></h4>
-                                <p>Leggera, bassa fermentazione, servita fredda</p>
-                            </div>
-                            <span className={styles.price}>€5</span>
-                        </li>
-                        <li className={styles.item}>
-                            <div className={styles.details}>
-                                <h4 className={styles.nameItem}>Birra ambrata <span className={styles.codes}>[1, 12]</span></h4>
-                                <p>Note caramellate, corpo medio</p>
-                            </div>
-                            <span className={styles.price}>€6</span>
-                        </li>
-                        <li className={styles.item}>
-                            <div className={styles.details}>
-                                <h4 className={styles.nameItem}>Birra IPA <span className={styles.codes}>[1, 12]</span></h4>
-                                <p>Amara, aromi agrumati e luppolo intenso</p>
-                            </div>
-                            <span className={styles.price}>€6</span>
-                        </li>
-                        <li className={styles.item}>
-                            <div className={styles.details}>
-                                <h4 className={styles.nameItem}>Birra rossa <span className={styles.codes}>[1, 12]</span></h4>
-                                <p>Corposa, retrogusto tostato</p>
-                            </div>
-                            <span className={styles.price}>€6</span>
-                        </li>
-                        <li className={styles.item}>
-                            <div className={styles.details}>
-                                <h4 className={styles.nameItem}>Birra analcolica <span className={styles.codes}>[1]</span></h4>
-                                <p>Gusto classico, zero alcol</p>
-                            </div>
-                            <span className={styles.price}>€4</span>
-                        </li>
-                    </ul>
-                </section>
+                            <ul className={styles.list}>
+                                {items.map((item) => {
+                                    const piatto = item.coll_food ? foodByDocumentId.get(item.coll_food) : undefined;
 
+                                    return (
+                                        <li
+                                            key={item.documentId}
+                                            id={`drink-${item.documentId}`}
+                                            className={styles.item}
+                                        >
+                                            <div className={styles.details}>
+                                                <h4 className={styles.nameItem}>{item.nome}</h4>
+                                                {item.descrizione && <p>{item.descrizione}</p>}
 
+                                                {/* CONSIGLIATO CON (Food) */}
+                                                {piatto && (
+                                                    <div className={styles.pairing}>
+                                                        <span className={styles.pairingLabel}>Provalo con:</span>
+
+                                                        <a
+                                                            href={`/menu-food#food-${piatto.documentId}`}
+                                                            className={styles.pairingCard}
+                                                            aria-label={`Vedi ${piatto.nome} nel menu food`}
+                                                        >
+                                                            <span className={styles.pairingIcon}>🍴 </span>
+                                                            <span className={styles.pairingText}>{piatto.nome}</span>
+                                                            <span className={styles.pairingArrow}>›</span>
+                                                        </a>
+                                                    </div>
+                                                )}
+                                            </div>
+
+                                            <span className={styles.price}>€{item.prezzo}</span>
+                                        </li>
+                                    );
+                                })}
+                            </ul>
+                        </section>
+                    ))
+                )}
             </main>
-
-            <nav className={styles.anchorNav}>
-                <a href="#alcolici" title="Alcolici">🍸</a>
-                <a href="#analcolici" title="Analcolici">🍺</a>
-                <a href="#birra" title="Birra">🍺</a>
-                <a href="#vino" title="Vino">🍷</a>
-                <a href="#soft" title="Soft">🍺</a>
-            </nav>
 
             <Footer />
         </div>

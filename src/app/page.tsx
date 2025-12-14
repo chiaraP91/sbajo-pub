@@ -16,19 +16,19 @@ export default function HomePage() {
 
         <nav className={styles.iconGrid} aria-label="Sezioni principali">
           <Link href="/menu-food" className={styles.appIcon}>
-            <img src="/assets/img/foto4.png" alt="Menu drink icon" className={styles.iconImage} />
+            <img src="/assets/img/foto1.png" alt="Menu food icon" className={styles.iconImage} />
           </Link>
 
           <Link href="/menu-drink" className={styles.appIcon}>
-            <img src="/assets/img/foto5.png" alt="Menu drink icon" className={styles.iconImage} />
+            <img src="/assets/img/foto2.png" alt="Menu drink icon" className={styles.iconImage} />
           </Link>
 
           <Link href="/eventi" className={styles.appIcon}>
-           <img src="/assets/img/foto6.png" alt="Menu drink icon" className={styles.iconImage} />
+           <img src="/assets/img/menu3.png" alt="Eventi icon" className={styles.iconImage} />
           </Link>
 
           <Link href="/chi-siamo" className={styles.appIcon}>
-            <img src="/assets/img/foto2.png" alt="Menu drink icon" className={styles.iconImage} />
+            <img src="/assets/img/menu4.png" alt="Chi siamo icon" className={styles.iconImage} />
           </Link>
         </nav>
 
