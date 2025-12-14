@@ -78,14 +78,40 @@
 .formInput {
   width: 100%;
   padding: 12px;
-  font-size: 16px;
+  font-size: 16px; // tienilo a 16 per evitare zoom iOS
   border: 2px solid $gold;
   border-radius: 8px;
   background-color: #333;
   color: white;
   margin-top: 8px;
   transition: all 0.3s ease;
+
+  line-height: 1.2;
+  height: 54px;          // <<< forza altezza uguale per tutti
+  box-sizing: border-box;
 }
+
+/* SOLO iOS: date/time a volte diventano più alti */
+.formInput[type="date"],
+.formInput[type="time"] {
+  padding: 0 12px;       // <<< niente padding verticale gigante
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+/* Allinea il testo interno su iOS */
+.formInput[type="date"]::-webkit-date-and-time-value,
+.formInput[type="time"]::-webkit-date-and-time-value {
+  text-align: left;
+  padding: 0;
+}
+
+/* Se l’icona/calendario iOS rompe il layout, riducila */
+.formInput[type="date"]::-webkit-calendar-picker-indicator {
+  opacity: 0.8;
+  cursor: pointer;
+}
+
 
 .formInput:focus {
   border-color: $gold-strong;
@@ -187,4 +213,16 @@ textarea.formInput {
 .modalCall {
   background: #0f6c3f;
   color: white;
+}
+
+.scrollArea {
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+
+.wrapper {
+  min-height: 100dvh;
+  height: auto;
+  justify-content: flex-start; // evita centrature verticali aggressive
 }

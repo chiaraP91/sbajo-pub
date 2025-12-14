@@ -93,10 +93,12 @@
   width: min(420px, 88vw);
   display: grid;
   gap: 14px;
-  margin-top: 8px;
+  margin: 8px auto 0;
+  justify-items: center; // centra i bottoni dentro la grid
   position: relative;
   z-index: 2;
 }
+
 
 .content {
   position: relative;
@@ -113,6 +115,7 @@
   font-family: 'Spectral', serif;
   font-size: 22px;
   letter-spacing: .3px;
+  width: 100%; // oppure 92% se li vuoi più “aria”
 
   color: $gold;
   background: rgba(0,0,0,.18);

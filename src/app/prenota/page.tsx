@@ -80,7 +80,7 @@ persone: ${numeroPersone} ${personeLabel}${noteSection}`;
     };
 
     const apriWhatsapp = () => {
-        const numeroWhatsApp = '+393318831199';
+        const numeroWhatsApp = '+393333807934';
         const messaggio = buildWhatsappMessage();
         const url = `https://wa.me/${numeroWhatsApp}?text=${messaggio}`;
         window.open(url, '_blank');
