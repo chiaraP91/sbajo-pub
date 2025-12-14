@@ -28,6 +28,12 @@ export default function Footer() {
           <span>Instagram</span>
         </a>
       </nav>
+      <div className={styles.signature}>
+        <span>Spazio web realizzato da: GaIA Software Studio per lo </span>
+        <span>Sbajo di Silvio Falcone <span style={{ textDecoration: "underline" }}>P.Iva: 01234567890</span></span>
+        
+      </div>
+
     </footer>
   );
 }

@@ -65,3 +65,15 @@
     color: $gold-strong;
   }
 }
+
+.signature {
+  margin-top: 18px;
+  text-align: center;
+  font-family: 'Spectral', serif;
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  color:  $gold-strong;
+  display: flex;
+  flex-direction: column;
+
+}

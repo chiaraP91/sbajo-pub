@@ -21,24 +21,14 @@ type EventsSectionProps = {
 const DEFAULT_EVENTS: EventItem[] = [
   {
     id: 1,
-    day: "10",
-    month: "MAGGIO",
-    title: "Gin Tonic & Vinyl Night",
-    description: "Una serata per appassionati di gin, vinili e serate sbajate.",
+    day: "20",
+    month: "DICEMBRE",
+    title: "Inaugurazione",
+    description: "Una serata per appassionati delle serate sbajate.",
     imageUrl: "/assets/img/drink1.png",
     cta: "Prenota il tuo posto",
     href: "/prenota"
   },
-  {
-    id: 2,
-    day: "26",
-    month: "APRILE",
-    title: "Aperitivo Swing",
-    description: "Live band, swing e cocktail old fashioned fino a tardi.",
-    imageUrl: "/assets/img/drink2.png",
-    cta: "Scopri di più",
-    href: "/eventi/aperitivo-swing"
-  }
 ];
 
 const EventiPage: React.FC<EventsSectionProps> = ({ events }) => {

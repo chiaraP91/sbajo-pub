@@ -24,20 +24,33 @@
 
 .nav {
   display: flex;
-  gap: 16px;
+  align-items: center;
+  gap: 14px;
 }
 
 .icon {
-  font-size: 22px;
-  color: $gold;
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
   text-decoration: none;
-  transition: transform .2s ease;
+  color: $gold;
+  transition: transform .2s ease, background .2s ease;
 }
 
 .icon:hover,
 .icon:focus-visible {
-  transform: scale(1.2);
-  color: $gold-strong;
+  transform: translateY(-1px) scale(1.06);
+  background: rgba(221,187,121,.06);
+}
+
+.iconImage {
+  width: 24px;          // invece di 3rem
+  height: 24px;
+  object-fit: contain;  // IMPORTANTISSIMO
+  display: block;
+  opacity: .95;
 }
 
 .logoImage {
@@ -45,7 +58,3 @@
   height: 5rem;
 }
 
-.iconImage {
-  width: 3rem;
-  height: 3rem;
-}

@@ -88,58 +88,45 @@
   margin: 0 0 6dvh;
 }
 
-.iconGrid {
+
+.actions {
+  width: min(420px, 88vw);
+  display: grid;
+  gap: 14px;
+  margin-top: 8px;
   position: relative;
   z-index: 2;
-  margin: 0 auto;
-  padding: 0 16px 8dvh;
-  display: grid;
-  grid-template-columns: repeat(2, minmax(136px, 1fr));
-  gap: clamp(14px, 3vw, 28px);
-  max-width: 720px;
-
- a {
-  color: inherit;
-  text-decoration: none;
-  padding: 0px;
-  margin: 0px;
-  box-shadow: none;
-}
 }
 
-.appIcon {
+.content {
+  position: relative;
+  z-index: 2;
+}
+
+
+.pillBtn {
   display: grid;
   place-items: center;
-  gap: 10px;
+  height: 54px;
+  border-radius: 10px;
   text-decoration: none;
-  color: $gold;
-  padding: 18px 14px;
-  border-radius: 22px;
-  outline: 1px solid var(--ring);
-  box-shadow: 0 10px 30px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.02);
-  transition: transform .2s ease, outline-color .2s ease, background .2s ease;
-  max-width: 15rem;
-}
-
-.appIcon:hover,
-.appIcon:focus-visible {
-  transform: translateY(-2px);
-  outline-color: $gold;
-}
-
-.appIcon svg {
-  width: clamp(44px, 6vw, 64px);
-  height: clamp(44px, 6vw, 64px);
-  stroke: $gold;
-  fill: none;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  filter: drop-shadow(0 2px 0 rgba(0,0,0,.4));
-}
-
-.appIcon span {
   font-family: 'Spectral', serif;
-  font-size: clamp(13px, 1.8vw, 18px);
+  font-size: 22px;
   letter-spacing: .3px;
+
+  color: $gold;
+  background: rgba(0,0,0,.18);
+  border: 1.5px solid rgba(221, 187, 121, .85); // oro “outline”
+  box-shadow:
+    0 10px 26px rgba(0,0,0,.45),
+    inset 0 1px 0 rgba(255,255,255,.04);
+
+  transition: transform .18s ease, background .18s ease, border-color .18s ease;
 }
 
+.pillBtn:hover,
+.pillBtn:focus-visible {
+  transform: translateY(-2px);
+  background: rgba(0,0,0,.28);
+  border-color: $gold;
+}

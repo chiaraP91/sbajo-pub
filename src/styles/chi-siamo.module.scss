@@ -1,0 +1,166 @@
+@use "./variables" as *;
+
+.wrapper {
+  min-height: 100dvh;
+  background: $bg-dark;
+  color: $gold;
+  overflow: hidden;
+  position: relative;
+}
+
+.scrim {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background:
+    radial-gradient(120% 80% at 50% 100%, #00000038 0%, #00000038 70%),
+    linear-gradient(to top, #0000003b 0, #0003 60%, #0000002e 100%);
+  backdrop-filter: blur(1px);
+}
+
+.scrollArea {
+  position: relative;
+  z-index: 2;
+  padding: 18px 16px 34px;
+  max-width: 980px;
+  margin: 0 auto;
+}
+
+.hero {
+  display: grid;
+  justify-items: center;
+  text-align: center;
+  padding: 18px 0 14px;
+}
+
+.brandMark {
+  font-family: "Spectral", serif;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  font-size: clamp(44px, 10vw, 84px);
+  line-height: 1;
+  text-shadow: 0 14px 40px rgba(0,0,0,.55);
+}
+
+.sub {
+  margin: 10px 0 16px;
+  font-family: "Spectral", serif;
+  font-size: clamp(16px, 4.2vw, 22px);
+  color: $gold-strong;
+  opacity: .95;
+}
+
+.cta {
+  display: inline-grid;
+  place-items: center;
+  height: 52px;
+  padding: 0 22px;
+  border-radius: 999px;
+  text-decoration: none;
+  color: $gold;
+  font-family: "Spectral", serif;
+  font-size: 18px;
+  background: rgba(0,0,0,.18);
+  border: 1.5px solid rgba(221, 187, 121, .85);
+  box-shadow: 0 12px 30px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.04);
+  transition: transform .18s ease, background .18s ease, border-color .18s ease;
+}
+
+.cta:hover,
+.cta:focus-visible {
+  transform: translateY(-2px);
+  background: rgba(0,0,0,.28);
+  border-color: $gold;
+}
+
+.card {
+  margin-top: 16px;
+  border-radius: 22px;
+  overflow: hidden;
+  outline: 1px solid rgba(221,187,121,.22);
+  background: rgba(0,0,0,.40);
+  box-shadow: 0 18px 60px rgba(0,0,0,.55);
+  display: grid;
+  grid-template-columns: 1fr;
+}
+
+.media {
+  position: relative;
+  height: 280px;
+  background: rgba(0,0,0,.25);
+}
+
+.photo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: saturate(.95) contrast(.95) brightness(.92);
+}
+
+.content {
+  padding: 18px 16px 20px;
+  display: grid;
+  gap: 12px;
+}
+
+.title {
+  margin: 0;
+  font-family: "Spectral", serif;
+  font-size: 28px;
+  letter-spacing: .02em;
+}
+
+.text {
+  margin: 0;
+  color: rgba(221,187,121,.85);
+  line-height: 1.5;
+}
+
+.infoRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding-top: 4px;
+}
+
+.infoPill {
+  padding: 10px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(221,187,121,.22);
+  background: rgba(0,0,0,.22);
+  display: grid;
+  gap: 2px;
+  min-width: 120px;
+}
+
+.infoLabel {
+  font-size: 11px;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  opacity: .7;
+}
+
+.infoValue {
+  font-family: "Spectral", serif;
+  font-size: 14px;
+  color: $gold;
+}
+
+.ctaSecondary {
+  margin-top: 6px;
+  justify-self: start;
+  text-decoration: none;
+  color: $gold;
+  border-bottom: 1px solid rgba(221,187,121,.65);
+  padding-bottom: 2px;
+}
+
+@media (min-width: 760px) {
+  .card {
+    grid-template-columns: 360px 1fr;
+  }
+  .media {
+    height: auto;
+    min-height: 360px;
+  }
+}

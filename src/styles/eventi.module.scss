@@ -24,7 +24,8 @@ $gold-strong: #e6c98c;
   justify-content: center;
   align-items: center;
   flex-direction: column;
-  margin-top: 2rem;
+  opacity: 0.9;
+  background-color: #000000d9;
 }
 
 .eventsTitle {
@@ -32,7 +33,6 @@ $gold-strong: #e6c98c;
   margin-bottom: 0.8rem;
   font-weight: 600;
   color: $gold-strong;
-  background-color: #000000d9;
   max-width: 60%;
   padding: 0.5rem 1rem;
 }
@@ -40,8 +40,7 @@ $gold-strong: #e6c98c;
 .eventsSubtitle {
   font-size: 1.5rem;
   line-height: 1.6;
-  opacity: 0.9;
-  background-color: #000000d9;
+ 
   max-width: 85%;
   padding: 0.5rem 1rem;
 }

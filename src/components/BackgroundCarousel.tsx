@@ -3,8 +3,9 @@ import { useEffect, useState } from 'react';
 import styles from '@/styles/home.module.scss';
 
 const slides = [
-  '/assets/img/pub4.jpg',
-  '/assets/img/pub5.jpg',
+  '/assets/img/sfondo1.png',
+  '/assets/img/sfondo2.png',
+  '/assets/img/sfondo3.png',
 ];
 
 export default function BackgroundCarousel() {
