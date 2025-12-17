@@ -1,5 +1,6 @@
 "use client";
 
+import AdminGate from "@/components/AdminGate";
 import { useEffect, useMemo, useState } from "react";
 import {
   collection,
@@ -11,12 +12,12 @@ import {
   serverTimestamp,
   deleteDoc,
   Transaction,
+  getDoc,
+  setDoc,
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import s from "@/styles/adminMenuEditor.module.scss";
-import { useSearchParams } from "next/navigation";
-import { getDoc, setDoc } from "firebase/firestore";
-
+import { useRouter, useSearchParams } from "next/navigation";
 
 type MenuType = "food" | "drink";
 
@@ -29,11 +30,8 @@ type MenuItem = {
   price: number;
   category: string;
   disponibile: boolean;
-
-  // collegamenti separati (come Strapi)
   linkFoodId: number | null;
   linkDrinkId: number | null;
-
   createdAt?: any;
 };
 
@@ -62,21 +60,10 @@ const ALLERGENS: Array<{ code: number; label: string }> = [
 
 const FOOD_CATEGORIES = ["Panini", "Fritti", "Taglieri", "Dolci", "Altro"] as const;
 const DRINK_CATEGORIES = ["Cocktail", "Birre", "Vini", "Analcolici", "Altro"] as const;
-const sp = useSearchParams();
-const editType = sp.get("type") as MenuType | null;
-const editIdRaw = sp.get("id");
-const editId = editIdRaw ? Number(editIdRaw) : null;
-
-const isEdit = !!editType && Number.isFinite(editId);
-const [loadingEdit, setLoadingEdit] = useState(false);
 
 function toNumberOrNull(v: string): number | null {
   const n = Number(v);
   return Number.isFinite(n) ? n : null;
-}
-
-function collectionFor(type: MenuType) {
-  return type === "food" ? "menu-food" : "menu-drink";
 }
 
 function normalizePrice(raw: string) {
@@ -86,26 +73,33 @@ function normalizePrice(raw: string) {
 }
 
 export default function MenuEditorPage() {
+  const router = useRouter();
+  const sp = useSearchParams();
+
+  const editType = sp.get("type") as MenuType | null;
+  const editIdRaw = sp.get("id");
+  const editId = editIdRaw ? Number(editIdRaw) : null;
+
+  const isEdit = !!editType && Number.isFinite(editId);
+
   // form state
   const [menuType, setMenuType] = useState<MenuType>("drink");
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState<string>("");
-
   const [category, setCategory] = useState<string>("Cocktail");
   const [allergens, setAllergens] = useState<number[]>([]);
-
-  // link separati
   const [linkFoodId, setLinkFoodId] = useState<string>("");
   const [linkDrinkId, setLinkDrinkId] = useState<string>("");
 
-  // data
+  // dropdown options (link)
   const [foodItems, setFoodItems] = useState<LinkItem[]>([]);
   const [drinkItems, setDrinkItems] = useState<LinkItem[]>([]);
   const [loadingList, setLoadingList] = useState(true);
 
   // ui
   const [saving, setSaving] = useState(false);
+  const [loadingEdit, setLoadingEdit] = useState(false);
   const [msg, setMsg] = useState<string | null>(null);
   const [err, setErr] = useState<string | null>(null);
 
@@ -114,55 +108,19 @@ export default function MenuEditorPage() {
     [menuType]
   );
 
+  // cambio menuType => reset campi dipendenti
   useEffect(() => {
     setCategory(menuType === "food" ? FOOD_CATEGORIES[0] : DRINK_CATEGORIES[0]);
     setLinkFoodId("");
     setLinkDrinkId("");
   }, [menuType]);
 
-  useEffect(() => {
-    const loadEdit = async () => {
-      if (!isEdit || !editType || editId == null) return;
+  function onAllergensChange(e: React.ChangeEvent<HTMLSelectElement>) {
+    const selected = Array.from(e.target.selectedOptions).map((o) => Number(o.value));
+    setAllergens(selected.filter((n) => Number.isFinite(n)));
+  }
 
-      setLoadingEdit(true);
-      setErr(null);
-      setMsg(null);
-
-      try {
-        const ref = doc(db, editType === "food" ? "menu-food" : "menu-drink", String(editId));
-        const snap = await getDoc(ref);
-
-        if (!snap.exists()) {
-          setErr(`Elemento non trovato: ${editType} #${editId}`);
-          return;
-        }
-
-        const x = snap.data() as any;
-
-        setMenuType(editType);
-        setName(String(x.name ?? ""));
-        setDescription(String(x.description ?? ""));
-        setPrice(String(x.price ?? x.prezzo ?? ""));
-
-        setCategory(String(x.category ?? (editType === "food" ? "Panini" : "Cocktail")));
-        setAllergens(Array.isArray(x.allergens) ? x.allergens : []);
-
-        setLinkFoodId(x.linkFoodId != null ? String(x.linkFoodId) : "");
-        setLinkDrinkId(x.linkDrinkId != null ? String(x.linkDrinkId) : "");
-      } catch (e) {
-        console.error(e);
-        setErr("Errore durante il caricamento dell’elemento da modificare.");
-      } finally {
-        setLoadingEdit(false);
-      }
-    };
-
-    loadEdit();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [editType, editIdRaw]);
-
-
-  async function refreshList() {
+  async function refreshLinkOptions() {
     setLoadingList(true);
     setErr(null);
 
@@ -199,26 +157,56 @@ export default function MenuEditorPage() {
   }
 
   useEffect(() => {
-    refreshList();
+    refreshLinkOptions();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  function onAllergensChange(e: React.ChangeEvent<HTMLSelectElement>) {
-    const selected = Array.from(e.target.selectedOptions).map((o) => Number(o.value));
-    setAllergens(selected.filter((n) => Number.isFinite(n)));
-  }
+  // carica in edit mode
+  useEffect(() => {
+    const loadEdit = async () => {
+      if (!isEdit || !editType || editId == null) return;
 
-  // lista unificata per view (key univoca!)
-  const allItems = useMemo(() => {
-    return [...foodItems, ...drinkItems].sort((a, b) => a.numericId - b.numericId);
-  }, [foodItems, drinkItems]);
+      setLoadingEdit(true);
+      setErr(null);
+      setMsg(null);
+
+      try {
+        const col = editType === "food" ? "menu-food" : "menu-drink";
+        const ref = doc(db, col, String(editId));
+        const snap = await getDoc(ref);
+
+        if (!snap.exists()) {
+          setErr(`Elemento non trovato: ${editType} #${editId}`);
+          return;
+        }
+
+        const x = snap.data() as any;
+
+        setMenuType(editType);
+        setName(String(x.name ?? ""));
+        setDescription(String(x.description ?? ""));
+        setPrice(String(x.price ?? ""));
+        setCategory(String(x.category ?? (editType === "food" ? "Panini" : "Cocktail")));
+        setAllergens(Array.isArray(x.allergens) ? x.allergens : []);
+        setLinkFoodId(x.linkFoodId != null ? String(x.linkFoodId) : "");
+        setLinkDrinkId(x.linkDrinkId != null ? String(x.linkDrinkId) : "");
+      } catch (e) {
+        console.error(e);
+        setErr("Errore durante il caricamento dell’elemento da modificare.");
+      } finally {
+        setLoadingEdit(false);
+      }
+    };
+
+    loadEdit();
+  }, [isEdit, editType, editId]);
 
   const foodOptions = useMemo(
     () =>
       foodItems.map((it) => ({
         value: String(it.numericId),
         label: `#${it.numericId} · ${it.name}`,
-        key: `food-${it.numericId}`, // ✅ key univoca
+        key: `food-${it.numericId}`,
       })),
     [foodItems]
   );
@@ -228,7 +216,7 @@ export default function MenuEditorPage() {
       drinkItems.map((it) => ({
         value: String(it.numericId),
         label: `#${it.numericId} · ${it.name}`,
-        key: `drink-${it.numericId}`, // ✅ key univoca
+        key: `drink-${it.numericId}`,
       })),
     [drinkItems]
   );
@@ -242,9 +230,8 @@ export default function MenuEditorPage() {
     if (!trimmedName) return setErr("Il nome è obbligatorio.");
     if (!trimmedDesc) return setErr("La descrizione è obbligatoria.");
 
-    const normalizedPrice = price.replace(",", ".").trim();
-    const priceNum = Number(normalizedPrice);
-    if (!Number.isFinite(priceNum)) return setErr("Prezzo non valido (es: 8.50).");
+    const priceNum = normalizePrice(price);
+    if (priceNum == null) return setErr("Prezzo non valido (es: 8.50).");
     if (priceNum < 0) return setErr("Prezzo non può essere negativo.");
 
     const linkFoodNum = linkFoodId ? toNumberOrNull(linkFoodId) : null;
@@ -253,33 +240,35 @@ export default function MenuEditorPage() {
     setSaving(true);
 
     try {
-      // EDIT: salvo sul doc esistente
+      // EDIT
       if (isEdit && editType && editId != null) {
-        const targetCollection = editType === "food" ? "menu-food" : "menu-drink";
-        const itemRef = doc(db, targetCollection, String(editId));
+        const col = editType === "food" ? "menu-food" : "menu-drink";
+        const itemRef = doc(db, col, String(editId));
 
-        const payload = {
-          numericId: editId,
-          menuType: editType,
-          name: trimmedName,
-          description: trimmedDesc,
-          allergens,
-          price: Math.round(priceNum * 100) / 100,
-          category,
-          disponibile: true, // se vuoi, qui metti un toggle
-          linkFoodId: linkFoodNum ?? null,
-          linkDrinkId: linkDrinkNum ?? null,
-          updatedAt: serverTimestamp(),
-        };
-
-        await setDoc(itemRef, payload, { merge: true });
+        await setDoc(
+          itemRef,
+          {
+            numericId: editId,
+            menuType: editType,
+            name: trimmedName,
+            description: trimmedDesc,
+            allergens,
+            price: priceNum,
+            category,
+            disponibile: true,
+            linkFoodId: linkFoodNum ?? null,
+            linkDrinkId: linkDrinkNum ?? null,
+            updatedAt: serverTimestamp(),
+          },
+          { merge: true }
+        );
 
         setMsg(`Aggiornato ✅ (${editType} #${editId})`);
-        await refreshList();
+        await refreshLinkOptions();
         return;
       }
 
-      // CREATE: creo nuovo id progressivo
+      // CREATE
       const counterRef = doc(db, "meta", "menuItemCounter");
       const targetCollection = menuType === "food" ? "menu-food" : "menu-drink";
 
@@ -291,14 +280,13 @@ export default function MenuEditorPage() {
         tx.set(counterRef, { value: next }, { merge: true });
 
         const itemRef = doc(db, targetCollection, String(next));
-
         const payload: MenuItem = {
           numericId: next,
           menuType,
           name: trimmedName,
           description: trimmedDesc,
           allergens,
-          price: Math.round(priceNum * 100) / 100,
+          price: priceNum,
           category,
           disponibile: true,
           linkFoodId: linkFoodNum ?? null,
@@ -318,7 +306,7 @@ export default function MenuEditorPage() {
       setLinkFoodId("");
       setLinkDrinkId("");
 
-      await refreshList();
+      await refreshLinkOptions();
     } catch (e: any) {
       console.error(e);
       setErr(
@@ -331,169 +319,133 @@ export default function MenuEditorPage() {
     }
   }
 
-
-  async function removeItem(it: LinkItem) {
-    setErr(null);
-    setMsg(null);
-    if (!confirm(`Eliminare l'elemento #${it.numericId} (${it.menuType})?`)) return;
-
-    try {
-      await deleteDoc(doc(db, collectionFor(it.menuType), String(it.numericId)));
-      setMsg(`Eliminato #${it.numericId}`);
-      await refreshList();
-    } catch (e) {
-      console.error(e);
-      setErr("Errore durante l’eliminazione.");
-    }
-  }
-
   return (
-    <div className={s.page}>
-      <div className={s.container}>
-        <h1 className={s.title}>Admin Menu</h1>
-        <p className={s.subtitle}>Inserisci elementi Food/Drink e gestisci disponibilità.</p>
+    <AdminGate>
+      <div className={s.page}>
+        <div className={s.container}>
+          <div style={{ display: "flex", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
+            <div>
+              <h1 className={s.title}>Admin Menu</h1>
+              <p className={s.subtitle}>Inserisci / modifica elementi Food-Drink.</p>
+            </div>
 
-        {err && <div className={`${s.notice} ${s.noticeErr}`}>{err}</div>}
-        {msg && <div className={`${s.notice} ${s.noticeOk}`}>{msg}</div>}
-
-        <div className={s.card}>
-          <div className={s.formGrid}>
-            <label className={s.field}>
-              <span className={s.label}>Tipo menu</span>
-              <select
-                className={s.select}
-                value={menuType}
-                onChange={(e) => setMenuType(e.target.value as MenuType)}
-              >
-                <option value="food">Food</option>
-                <option value="drink">Drink</option>
-              </select>
-            </label>
-
-            <label className={s.field}>
-              <span className={s.label}>Tipologia elemento</span>
-              <select className={s.select} value={category} onChange={(e) => setCategory(e.target.value)}>
-                {categories.map((c) => (
-                  <option key={c} value={c}>
-                    {c}
-                  </option>
-                ))}
-              </select>
-            </label>
-
-            <label className={`${s.field} ${s.full}`}>
-              <span className={s.label}>Nome</span>
-              <input className={s.input} value={name} onChange={(e) => setName(e.target.value)} placeholder="Es: Negroni Sbajo" />
-            </label>
-
-            <label className={`${s.field} ${s.full}`}>
-              <span className={s.label}>Descrizione / ingredienti</span>
-              <textarea className={s.textarea} value={description} onChange={(e) => setDescription(e.target.value)} rows={4} placeholder="Ingredienti, note, ecc…" />
-            </label>
-
-            <label className={s.field}>
-              <span className={s.label}>Allergeni (multi-selezione)</span>
-              <select className={s.select} multiple value={allergens.map(String)} onChange={onAllergensChange} size={6}>
-                {ALLERGENS.map((a) => (
-                  <option key={a.code} value={a.code}>
-                    {a.code} · {a.label}
-                  </option>
-                ))}
-              </select>
-              <p className={s.hint}>Tip: Ctrl/Cmd per selezionare più voci.</p>
-            </label>
-
-            <label className={s.field}>
-              <span className={s.label}>Prezzo</span>
-              <input className={s.input} value={price} onChange={(e) => setPrice(e.target.value)} placeholder="Es: 8.50" inputMode="decimal" />
-            </label>
-
-            {/* collegamento food */}
-            <label className={`${s.field} ${s.full}`}>
-              <span className={s.label}>Collegamento Food (opzionale)</span>
-              <select className={s.select} value={linkFoodId} onChange={(e) => setLinkFoodId(e.target.value)}>
-                <option value="">Nessuno</option>
-                {foodOptions.map((o) => (
-                  <option key={o.key} value={o.value}>
-                    {o.label}
-                  </option>
-                ))}
-              </select>
-              <p className={s.hint}>Salviamo nel DB l’ID numerico del piatto collegato.</p>
-            </label>
-
-            {/* collegamento drink */}
-            <label className={`${s.field} ${s.full}`}>
-              <span className={s.label}>Collegamento Drink (opzionale)</span>
-              <select className={s.select} value={linkDrinkId} onChange={(e) => setLinkDrinkId(e.target.value)}>
-                <option value="">Nessuno</option>
-                {drinkOptions.map((o) => (
-                  <option key={o.key} value={o.value}>
-                    {o.label}
-                  </option>
-                ))}
-              </select>
-              <p className={s.hint}>Salviamo nel DB l’ID numerico del drink collegato.</p>
-            </label>
-
-            <div className={s.actions}>
-              {isEdit && (
-                <div className={`${s.notice} ${s.noticeOk}`}>
-                  Modalità modifica: {editType} #{editId}
-                </div>
-              )}
-
+            <div className={s.actions} style={{ marginTop: 0 }}>
               <button
                 type="button"
-                className={`${s.btn} ${s.btnPrimary}`}
-                onClick={saveItem}
-                disabled={saving || loadingEdit}
+                className={s.btn}
+                onClick={() => router.push("/admin/table-menu")}
               >
-                {saving ? "Salvataggio…" : isEdit ? "Salva modifiche" : "Salva su Firestore"}
-              </button>
-
-
-              <button type="button" className={s.btn} onClick={refreshList} disabled={loadingList || saving}>
-                Aggiorna lista
+                Vai a Table Menu
               </button>
             </div>
           </div>
-        </div>
 
-        <hr className={s.hr} />
+          {err && <div className={`${s.notice} ${s.noticeErr}`}>{err}</div>}
+          {msg && <div className={`${s.notice} ${s.noticeOk}`}>{msg}</div>}
 
-        <h2 className={s.title} style={{ fontSize: 22, marginTop: 0 }}>
-          Elementi già presenti
-        </h2>
+          <div className={s.card}>
+            <div className={s.formGrid}>
+              <label className={s.field}>
+                <span className={s.label}>Tipo menu</span>
+                <select
+                  className={s.select}
+                  value={menuType}
+                  onChange={(e) => setMenuType(e.target.value as MenuType)}
+                  disabled={isEdit} // in edit non cambiare collezione “per sbaglio”
+                >
+                  <option value="food">Food</option>
+                  <option value="drink">Drink</option>
+                </select>
+              </label>
 
-        {loadingList ? (
-          <p className={s.subtitle}>Caricamento…</p>
-        ) : allItems.length === 0 ? (
-          <p className={s.subtitle}>Nessun elemento.</p>
-        ) : (
-          <div className={s.list}>
-            {allItems.map((it) => (
-              <div key={`${it.menuType}-${it.numericId}`} className={s.item}>
-                <div className={s.itemTop}>
-                  <div>
-                    <p className={s.itemTitle}>
-                      #{it.numericId} · {it.name} <span style={{ opacity: 0.7 }}>({it.menuType})</span>
-                    </p>
+              <label className={s.field}>
+                <span className={s.label}>Tipologia elemento</span>
+                <select className={s.select} value={category} onChange={(e) => setCategory(e.target.value)}>
+                  {categories.map((c) => (
+                    <option key={c} value={c}>
+                      {c}
+                    </option>
+                  ))}
+                </select>
+              </label>
+
+              <label className={`${s.field} ${s.full}`}>
+                <span className={s.label}>Nome</span>
+                <input className={s.input} value={name} onChange={(e) => setName(e.target.value)} placeholder="Es: Negroni Sbajo" />
+              </label>
+
+              <label className={`${s.field} ${s.full}`}>
+                <span className={s.label}>Descrizione / ingredienti</span>
+                <textarea className={s.textarea} value={description} onChange={(e) => setDescription(e.target.value)} rows={4} placeholder="Ingredienti, note, ecc…" />
+              </label>
+
+              <label className={s.field}>
+                <span className={s.label}>Allergeni (multi-selezione)</span>
+                <select className={s.select} multiple value={allergens.map(String)} onChange={onAllergensChange} size={6}>
+                  {ALLERGENS.map((a) => (
+                    <option key={a.code} value={a.code}>
+                      {a.code} · {a.label}
+                    </option>
+                  ))}
+                </select>
+                <p className={s.hint}>Tip: Ctrl/Cmd per selezionare più voci.</p>
+              </label>
+
+              <label className={s.field}>
+                <span className={s.label}>Prezzo</span>
+                <input className={s.input} value={price} onChange={(e) => setPrice(e.target.value)} placeholder="Es: 8.50" inputMode="decimal" />
+              </label>
+
+              <label className={`${s.field} ${s.full}`}>
+                <span className={s.label}>Collegamento Food (opzionale)</span>
+                <select className={s.select} value={linkFoodId} onChange={(e) => setLinkFoodId(e.target.value)} disabled={loadingList}>
+                  <option value="">Nessuno</option>
+                  {foodOptions.map((o) => (
+                    <option key={o.key} value={o.value}>
+                      {o.label}
+                    </option>
+                  ))}
+                </select>
+                <p className={s.hint}>Salviamo nel DB l’ID numerico del piatto collegato.</p>
+              </label>
+
+              <label className={`${s.field} ${s.full}`}>
+                <span className={s.label}>Collegamento Drink (opzionale)</span>
+                <select className={s.select} value={linkDrinkId} onChange={(e) => setLinkDrinkId(e.target.value)} disabled={loadingList}>
+                  <option value="">Nessuno</option>
+                  {drinkOptions.map((o) => (
+                    <option key={o.key} value={o.value}>
+                      {o.label}
+                    </option>
+                  ))}
+                </select>
+                <p className={s.hint}>Salviamo nel DB l’ID numerico del drink collegato.</p>
+              </label>
+
+              <div className={s.actions}>
+                {isEdit && (
+                  <div className={`${s.notice} ${s.noticeOk}`}>
+                    Modalità modifica: {editType} #{editId}
                   </div>
+                )}
 
-                  <button type="button" className={`${s.btn} ${s.btnDanger}`} onClick={() => removeItem(it)}>
-                    Elimina
-                  </button>
-                </div>
+                <button
+                  type="button"
+                  className={`${s.btn} ${s.btnPrimary}`}
+                  onClick={saveItem}
+                  disabled={saving || loadingEdit}
+                >
+                  {saving ? "Salvataggio…" : isEdit ? "Salva modifiche" : "Salva su Firestore"}
+                </button>
 
-                <div className={s.badgeRow}>
-                  <span className={`${s.badge} ${s.badgeMuted}`}>Dettagli completi nel documento Firestore</span>
-                </div>
+                <button type="button" className={s.btn} onClick={refreshLinkOptions} disabled={loadingList || saving}>
+                  Aggiorna collegamenti
+                </button>
               </div>
-            ))}
+            </div>
           </div>
-        )}
+        </div>
       </div>
-    </div>
+    </AdminGate>
   );
 }

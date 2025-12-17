@@ -1,127 +1,53 @@
 "use client";
 
+import AdminGate from "@/components/AdminGate";
 import { useEffect, useMemo, useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import {
   collection,
+  deleteDoc,
   doc,
   getDocs,
   orderBy,
   query,
-  runTransaction,
-  serverTimestamp,
-  deleteDoc,
-  Transaction,
-  getDoc,
-  setDoc,
 } from "firebase/firestore";
-
 import { db } from "@/lib/firebase";
 import s from "@/styles/adminMenuEditor.module.scss";
 
 type MenuType = "food" | "drink";
 
-type MenuItem = {
+type MenuRow = {
   numericId: number;
   menuType: MenuType;
   name: string;
-  description: string;
-  allergens: number[];
-  price: number;
   category: string;
-  disponibile: boolean;
-
-  linkFoodId: number | null;
-  linkDrinkId: number | null;
-
-  createdAt?: any;
-  updatedAt?: any;
+  description?: string;
+  price?: number;
+  disponibile?: boolean;
 };
-
-type LinkItem = {
-  numericId: number;
-  menuType: MenuType;
-  name: string;
-};
-
-const ALLERGENS: Array<{ code: number; label: string }> = [
-  { code: 1, label: "Glutine" },
-  { code: 2, label: "Crostacei" },
-  { code: 3, label: "Uova" },
-  { code: 4, label: "Pesce" },
-  { code: 5, label: "Arachidi" },
-  { code: 6, label: "Soia" },
-  { code: 7, label: "Latte" },
-  { code: 8, label: "Frutta a guscio" },
-  { code: 9, label: "Sedano" },
-  { code: 10, label: "Senape" },
-  { code: 11, label: "Sesamo" },
-  { code: 12, label: "Solfiti" },
-  { code: 13, label: "Lupini" },
-  { code: 14, label: "Molluschi" },
-];
-
-const FOOD_CATEGORIES = ["Panini", "Fritti", "Taglieri", "Dolci", "Altro"] as const;
-const DRINK_CATEGORIES = ["Cocktail", "Birre", "Vini", "Analcolici", "Altro"] as const;
-
-function toNumberOrNull(v: string): number | null {
-  const n = Number(v);
-  return Number.isFinite(n) ? n : null;
-}
 
 function collectionFor(type: MenuType) {
   return type === "food" ? "menu-food" : "menu-drink";
 }
 
-export default function MenuEditorPage() {
-  // ✅ query params DEVONO stare dentro al componente
-  const sp = useSearchParams();
-  const editType = sp.get("type") as MenuType | null;
-  const editIdRaw = sp.get("id");
-  const editId = editIdRaw ? Number(editIdRaw) : null;
+function safeNumber(v: any): number | null {
+  const n = Number(v);
+  return Number.isFinite(n) ? n : null;
+}
 
-  const isEdit = !!editType && Number.isFinite(editId);
+export default function TableMenuPage() {
+  const router = useRouter();
 
-  const [loadingEdit, setLoadingEdit] = useState(false);
-
-  // form state
-  const [menuType, setMenuType] = useState<MenuType>("drink");
-  const [name, setName] = useState("");
-  const [description, setDescription] = useState("");
-  const [price, setPrice] = useState<string>("");
-
-  const [category, setCategory] = useState<string>("Cocktail");
-  const [allergens, setAllergens] = useState<number[]>([]);
-
-  const [linkFoodId, setLinkFoodId] = useState<string>("");
-  const [linkDrinkId, setLinkDrinkId] = useState<string>("");
-
-  // data
-  const [foodItems, setFoodItems] = useState<LinkItem[]>([]);
-  const [drinkItems, setDrinkItems] = useState<LinkItem[]>([]);
-  const [loadingList, setLoadingList] = useState(true);
-
-  // ui
-  const [saving, setSaving] = useState(false);
-  const [msg, setMsg] = useState<string | null>(null);
+  const [food, setFood] = useState<MenuRow[]>([]);
+  const [drink, setDrink] = useState<MenuRow[]>([]);
+  const [loading, setLoading] = useState(true);
   const [err, setErr] = useState<string | null>(null);
+  const [msg, setMsg] = useState<string | null>(null);
 
-  const categories = useMemo(
-    () => (menuType === "food" ? [...FOOD_CATEGORIES] : [...DRINK_CATEGORIES]),
-    [menuType]
-  );
-
-  // se NON sono in edit, quando cambio tipo resetto category/link (in edit li carichiamo dal doc)
-  useEffect(() => {
-    if (isEdit) return;
-    setCategory(menuType === "food" ? FOOD_CATEGORIES[0] : DRINK_CATEGORIES[0]);
-    setLinkFoodId("");
-    setLinkDrinkId("");
-  }, [menuType, isEdit]);
-
-  async function refreshList() {
-    setLoadingList(true);
+  async function refresh() {
+    setLoading(true);
     setErr(null);
+    setMsg(null);
 
     try {
       const [foodSnap, drinkSnap] = await Promise.all([
@@ -129,213 +55,80 @@ export default function MenuEditorPage() {
         getDocs(query(collection(db, "menu-drink"), orderBy("numericId", "asc"))),
       ]);
 
-      const foodData: LinkItem[] = foodSnap.docs
+      const foodData: MenuRow[] = foodSnap.docs
         .map((d) => {
           const x = d.data() as any;
-          const numericId = Number(x.numericId ?? d.id);
-          return { numericId, menuType: "food" as const, name: String(x.name ?? "") };
+          const numericId = safeNumber(x.numericId ?? d.id);
+          if (numericId == null) return null;
+          return {
+            numericId,
+            menuType: "food",
+            name: String(x.name ?? ""),
+            category: String(x.category ?? "Altro"),
+            description: x.description ? String(x.description) : "",
+            price: safeNumber(x.price) ?? undefined,
+            disponibile: typeof x.disponibile === "boolean" ? x.disponibile : undefined,
+          } as MenuRow;
         })
-        .filter((x) => Number.isFinite(x.numericId) && x.name);
+        .filter(Boolean) as MenuRow[];
 
-      const drinkData: LinkItem[] = drinkSnap.docs
+      const drinkData: MenuRow[] = drinkSnap.docs
         .map((d) => {
           const x = d.data() as any;
-          const numericId = Number(x.numericId ?? d.id);
-          return { numericId, menuType: "drink" as const, name: String(x.name ?? "") };
+          const numericId = safeNumber(x.numericId ?? d.id);
+          if (numericId == null) return null;
+          return {
+            numericId,
+            menuType: "drink",
+            name: String(x.name ?? ""),
+            category: String(x.category ?? "Altro"),
+            description: x.description ? String(x.description) : "",
+            price: safeNumber(x.price) ?? undefined,
+            disponibile: typeof x.disponibile === "boolean" ? x.disponibile : undefined,
+          } as MenuRow;
         })
-        .filter((x) => Number.isFinite(x.numericId) && x.name);
+        .filter(Boolean) as MenuRow[];
 
-      setFoodItems(foodData);
-      setDrinkItems(drinkData);
+      setFood(foodData);
+      setDrink(drinkData);
     } catch (e) {
       console.error(e);
       setErr("Non riesco a leggere i dati da Firestore (menu-food / menu-drink).");
     } finally {
-      setLoadingList(false);
+      setLoading(false);
     }
   }
 
   useEffect(() => {
-    refreshList();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    refresh();
   }, []);
 
-  // ✅ carico l'elemento in modalità edit
-  useEffect(() => {
-    const loadEdit = async () => {
-      if (!isEdit || !editType || editId == null) return;
+  const all = useMemo(() => {
+    return [...food, ...drink].sort((a, b) => a.numericId - b.numericId);
+  }, [food, drink]);
 
-      setLoadingEdit(true);
-      setErr(null);
-      setMsg(null);
-
-      try {
-        const ref = doc(db, collectionFor(editType), String(editId));
-        const snap = await getDoc(ref);
-
-        if (!snap.exists()) {
-          setErr(`Elemento non trovato: ${editType} #${editId}`);
-          return;
-        }
-
-        const x = snap.data() as any;
-
-        setMenuType(editType);
-        setName(String(x.name ?? ""));
-        setDescription(String(x.description ?? ""));
-        setPrice(String(x.price ?? ""));
-
-        setCategory(String(x.category ?? (editType === "food" ? "Panini" : "Cocktail")));
-        setAllergens(Array.isArray(x.allergens) ? x.allergens : []);
-
-        setLinkFoodId(x.linkFoodId != null ? String(x.linkFoodId) : "");
-        setLinkDrinkId(x.linkDrinkId != null ? String(x.linkDrinkId) : "");
-      } catch (e) {
-        console.error(e);
-        setErr("Errore durante il caricamento dell’elemento da modificare.");
-      } finally {
-        setLoadingEdit(false);
-      }
-    };
-
-    loadEdit();
-  }, [isEdit, editType, editId]);
-
-  function onAllergensChange(e: React.ChangeEvent<HTMLSelectElement>) {
-    const selected = Array.from(e.target.selectedOptions).map((o) => Number(o.value));
-    setAllergens(selected.filter((n) => Number.isFinite(n)));
+  function goCreate(type: MenuType) {
+    router.push(`/admin/menu-editor?type=${type}`);
   }
 
-  const allItems = useMemo(() => {
-    return [...foodItems, ...drinkItems].sort((a, b) => a.numericId - b.numericId);
-  }, [foodItems, drinkItems]);
+  function goEdit(row: MenuRow) {
+    router.push(`/admin/menu-editor?type=${row.menuType}&id=${row.numericId}`);
+  }
 
-  const foodOptions = useMemo(
-    () =>
-      foodItems.map((it) => ({
-        value: String(it.numericId),
-        label: `#${it.numericId} · ${it.name}`,
-        key: `food-${it.numericId}`,
-      })),
-    [foodItems]
-  );
+  function goDisponibilita() {
+    router.push(`/admin/disponibilita`);
+  }
 
-  const drinkOptions = useMemo(
-    () =>
-      drinkItems.map((it) => ({
-        value: String(it.numericId),
-        label: `#${it.numericId} · ${it.name}`,
-        key: `drink-${it.numericId}`,
-      })),
-    [drinkItems]
-  );
-
-  async function saveItem() {
+  async function onDelete(row: MenuRow) {
     setErr(null);
     setMsg(null);
 
-    const trimmedName = name.trim();
-    const trimmedDesc = description.trim();
-    if (!trimmedName) return setErr("Il nome è obbligatorio.");
-    if (!trimmedDesc) return setErr("La descrizione è obbligatoria.");
-
-    const normalizedPrice = price.replace(",", ".").trim();
-    const priceNum = Number(normalizedPrice);
-    if (!Number.isFinite(priceNum)) return setErr("Prezzo non valido (es: 8.50).");
-    if (priceNum < 0) return setErr("Prezzo non può essere negativo.");
-
-    const linkFoodNum = linkFoodId ? toNumberOrNull(linkFoodId) : null;
-    const linkDrinkNum = linkDrinkId ? toNumberOrNull(linkDrinkId) : null;
-
-    setSaving(true);
+    if (!confirm(`Eliminare ${row.menuType} #${row.numericId} (${row.name})?`)) return;
 
     try {
-      // EDIT
-      if (isEdit && editType && editId != null) {
-        const itemRef = doc(db, collectionFor(editType), String(editId));
-
-        const payload = {
-          numericId: editId,
-          menuType: editType,
-          name: trimmedName,
-          description: trimmedDesc,
-          allergens,
-          price: Math.round(priceNum * 100) / 100,
-          category,
-          linkFoodId: linkFoodNum ?? null,
-          linkDrinkId: linkDrinkNum ?? null,
-          updatedAt: serverTimestamp(),
-        };
-
-        await setDoc(itemRef, payload, { merge: true });
-
-        setMsg(`Aggiornato ✅ (${editType} #${editId})`);
-        await refreshList();
-        return;
-      }
-
-      // CREATE
-      const counterRef = doc(db, "meta", "menuItemCounter");
-      const targetCollection = collectionFor(menuType);
-
-      const newNumericId = await runTransaction(db, async (tx: Transaction) => {
-        const counterSnap = await tx.get(counterRef);
-        const current = counterSnap.exists() ? Number(counterSnap.data()?.value ?? 0) : 0;
-        const next = current + 1;
-
-        tx.set(counterRef, { value: next }, { merge: true });
-
-        const itemRef = doc(db, targetCollection, String(next));
-
-        const payload: MenuItem = {
-          numericId: next,
-          menuType,
-          name: trimmedName,
-          description: trimmedDesc,
-          allergens,
-          price: Math.round(priceNum * 100) / 100,
-          category,
-          disponibile: true,
-          linkFoodId: linkFoodNum ?? null,
-          linkDrinkId: linkDrinkNum ?? null,
-          createdAt: serverTimestamp(),
-        };
-
-        tx.set(itemRef, payload);
-        return next;
-      });
-
-      setMsg(`Salvato ✅ (ID #${newNumericId})`);
-
-      setName("");
-      setDescription("");
-      setPrice("");
-      setAllergens([]);
-      setLinkFoodId("");
-      setLinkDrinkId("");
-
-      await refreshList();
-    } catch (e: any) {
-      console.error(e);
-      setErr(
-        e?.message?.includes("permission")
-          ? "Permesso negato: devi essere autenticata per scrivere su Firestore."
-          : "Errore durante il salvataggio su Firestore."
-      );
-    } finally {
-      setSaving(false);
-    }
-  }
-
-  async function removeItem(it: LinkItem) {
-    setErr(null);
-    setMsg(null);
-    if (!confirm(`Eliminare l'elemento #${it.numericId} (${it.menuType})?`)) return;
-
-    try {
-      await deleteDoc(doc(db, collectionFor(it.menuType), String(it.numericId)));
-      setMsg(`Eliminato #${it.numericId}`);
-      await refreshList();
+      await deleteDoc(doc(db, collectionFor(row.menuType), String(row.numericId)));
+      setMsg(`Eliminato: ${row.menuType} #${row.numericId}`);
+      await refresh();
     } catch (e) {
       console.error(e);
       setErr("Errore durante l’eliminazione.");
@@ -343,140 +136,100 @@ export default function MenuEditorPage() {
   }
 
   return (
-    <div className={s.page}>
-      <div className={s.container}>
-        <h1 className={s.title}>Admin Menu</h1>
-        <p className={s.subtitle}>Inserisci elementi Food/Drink e gestisci disponibilità.</p>
+    <AdminGate>
+      <div className={s.page}>
+        <div className={s.container}>
+          <h1 className={s.title}>Table Menu</h1>
+          <p className={s.subtitle}>
+            Lista completa. Clicca “Modifica” per aprire il menu-editor in modalità edit.
+          </p>
 
-        {err && <div className={`${s.notice} ${s.noticeErr}`}>{err}</div>}
-        {msg && <div className={`${s.notice} ${s.noticeOk}`}>{msg}</div>}
+          {err && <div className={`${s.notice} ${s.noticeErr}`}>{err}</div>}
+          {msg && <div className={`${s.notice} ${s.noticeOk}`}>{msg}</div>}
 
-        {isEdit && (
-          <div className={`${s.notice} ${s.noticeOk}`}>
-            Modalità modifica: {editType} #{editId}
-          </div>
-        )}
-
-        <div className={s.card}>
-          <div className={s.formGrid}>
-            <label className={s.field}>
-              <span className={s.label}>Tipo menu</span>
-              <select className={s.select} value={menuType} onChange={(e) => setMenuType(e.target.value as MenuType)}>
-                <option value="food">Food</option>
-                <option value="drink">Drink</option>
-              </select>
-            </label>
-
-            <label className={s.field}>
-              <span className={s.label}>Tipologia elemento</span>
-              <select className={s.select} value={category} onChange={(e) => setCategory(e.target.value)}>
-                {categories.map((c) => (
-                  <option key={c} value={c}>
-                    {c}
-                  </option>
-                ))}
-              </select>
-            </label>
-
-            <label className={`${s.field} ${s.full}`}>
-              <span className={s.label}>Nome</span>
-              <input className={s.input} value={name} onChange={(e) => setName(e.target.value)} placeholder="Es: Negroni Sbajo" />
-            </label>
-
-            <label className={`${s.field} ${s.full}`}>
-              <span className={s.label}>Descrizione / ingredienti</span>
-              <textarea className={s.textarea} value={description} onChange={(e) => setDescription(e.target.value)} rows={4} placeholder="Ingredienti, note, ecc…" />
-            </label>
-
-            <label className={s.field}>
-              <span className={s.label}>Allergeni (multi-selezione)</span>
-              <select className={s.select} multiple value={allergens.map(String)} onChange={onAllergensChange} size={6}>
-                {ALLERGENS.map((a) => (
-                  <option key={a.code} value={a.code}>
-                    {a.code} · {a.label}
-                  </option>
-                ))}
-              </select>
-              <p className={s.hint}>Tip: Ctrl/Cmd per selezionare più voci.</p>
-            </label>
-
-            <label className={s.field}>
-              <span className={s.label}>Prezzo</span>
-              <input className={s.input} value={price} onChange={(e) => setPrice(e.target.value)} placeholder="Es: 8.50" inputMode="decimal" />
-            </label>
-
-            <label className={`${s.field} ${s.full}`}>
-              <span className={s.label}>Collegamento Food (opzionale)</span>
-              <select className={s.select} value={linkFoodId} onChange={(e) => setLinkFoodId(e.target.value)}>
-                <option value="">Nessuno</option>
-                {foodOptions.map((o) => (
-                  <option key={o.key} value={o.value}>
-                    {o.label}
-                  </option>
-                ))}
-              </select>
-              <p className={s.hint}>Salviamo nel DB l’ID numerico del piatto collegato.</p>
-            </label>
-
-            <label className={`${s.field} ${s.full}`}>
-              <span className={s.label}>Collegamento Drink (opzionale)</span>
-              <select className={s.select} value={linkDrinkId} onChange={(e) => setLinkDrinkId(e.target.value)}>
-                <option value="">Nessuno</option>
-                {drinkOptions.map((o) => (
-                  <option key={o.key} value={o.value}>
-                    {o.label}
-                  </option>
-                ))}
-              </select>
-              <p className={s.hint}>Salviamo nel DB l’ID numerico del drink collegato.</p>
-            </label>
-
-            <div className={s.actions}>
-              <button type="button" className={`${s.btn} ${s.btnPrimary}`} onClick={saveItem} disabled={saving || loadingEdit}>
-                {saving ? "Salvataggio…" : isEdit ? "Salva modifiche" : "Salva su Firestore"}
+          <div className={s.card}>
+            <div className={s.actions} style={{ marginTop: 0 }}>
+              <button className={`${s.btn} ${s.btnPrimary}`} onClick={() => goCreate("food")}>
+                + Nuovo Food
               </button>
-
-              <button type="button" className={s.btn} onClick={refreshList} disabled={loadingList || saving}>
-                Aggiorna lista
+              <button className={`${s.btn} ${s.btnPrimary}`} onClick={() => goCreate("drink")}>
+                + Nuovo Drink
+              </button>
+              <button className={s.btn} onClick={refresh} disabled={loading}>
+                {loading ? "Aggiorno…" : "Aggiorna lista"}
+              </button>
+              <button className={`${s.btn} ${s.btnPrimary}`} onClick={() => goDisponibilita()}>
+                Disponibilità
               </button>
             </div>
-          </div>
-        </div>
 
-        <hr className={s.hr} />
+            <hr className={s.hr} />
 
-        <h2 className={s.title} style={{ fontSize: 22, marginTop: 0 }}>
-          Elementi già presenti
-        </h2>
+            {loading ? (
+              <p className={s.subtitle}>Caricamento…</p>
+            ) : all.length === 0 ? (
+              <p className={s.subtitle}>Nessun elemento.</p>
+            ) : (
+              <div className={s.list}>
+                {all.map((row) => (
+                  <div key={`${row.menuType}-${row.numericId}`} className={s.item}>
+                    <div className={s.itemTop}>
+                      <div style={{ minWidth: 0 }}>
+                        <p className={s.itemTitle} style={{ marginBottom: 6 }}>
+                          #{row.numericId} · {row.name}{" "}
+                          <span style={{ opacity: 0.7 }}>
+                            ({row.menuType} · {row.category})
+                          </span>
+                        </p>
 
-        {loadingList ? (
-          <p className={s.subtitle}>Caricamento…</p>
-        ) : allItems.length === 0 ? (
-          <p className={s.subtitle}>Nessun elemento.</p>
-        ) : (
-          <div className={s.list}>
-            {allItems.map((it) => (
-              <div key={`${it.menuType}-${it.numericId}`} className={s.item}>
-                <div className={s.itemTop}>
-                  <div>
-                    <p className={s.itemTitle}>
-                      #{it.numericId} · {it.name} <span style={{ opacity: 0.7 }}>({it.menuType})</span>
-                    </p>
+                        <div className={s.badgeRow}>
+                          {typeof row.price === "number" ? (
+                            <span className={s.badge}>€ {row.price}</span>
+                          ) : (
+                            <span className={`${s.badge} ${s.badgeMuted}`}>€ -</span>
+                          )}
+
+                          {typeof row.disponibile === "boolean" ? (
+                            <span className={`${s.badge} ${row.disponibile ? "" : s.badgeMuted}`}>
+                              {row.disponibile ? "Disponibile" : "Non disponibile"}
+                            </span>
+                          ) : (
+                            <span className={`${s.badge} ${s.badgeMuted}`}>Disponibilità: -</span>
+                          )}
+
+                          {row.description ? (
+                            <span className={`${s.badge} ${s.badgeMuted}`}>
+                              {row.description.length > 40
+                                ? row.description.slice(0, 40) + "…"
+                                : row.description}
+                            </span>
+                          ) : (
+                            <span className={`${s.badge} ${s.badgeMuted}`}>Descrizione: -</span>
+                          )}
+                        </div>
+                      </div>
+
+                      <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
+                        <button className={s.btn} onClick={() => goEdit(row)}>
+                          Modifica
+                        </button>
+                        <button className={`${s.btn} ${s.btnDanger}`} onClick={() => onDelete(row)}>
+                          Elimina
+                        </button>
+                      </div>
+                    </div>
                   </div>
-
-                  <button type="button" className={`${s.btn} ${s.btnDanger}`} onClick={() => removeItem(it)}>
-                    Elimina
-                  </button>
-                </div>
-
-                <div className={s.badgeRow}>
-                  <span className={`${s.badge} ${s.badgeMuted}`}>Dettagli completi nel documento Firestore</span>
-                </div>
+                ))}
               </div>
-            ))}
+            )}
           </div>
-        )}
+
+          <p className={s.subtitle} style={{ marginTop: 14 }}>
+            Percorsi: <strong>/admin/table-menu</strong> (lista) ·{" "}
+            <strong>/admin/menu-editor</strong> (editor)
+          </p>
+        </div>
       </div>
-    </div>
+    </AdminGate>
   );
 }
