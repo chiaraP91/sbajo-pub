@@ -58,8 +58,8 @@ const ALLERGENS: Array<{ code: number; label: string }> = [
   { code: 14, label: "Molluschi" },
 ];
 
-const FOOD_CATEGORIES = ["Panini", "Fritti", "Taglieri", "Dolci", "Altro"] as const;
-const DRINK_CATEGORIES = ["Cocktail", "Birre", "Vini", "Analcolici", "Altro"] as const;
+const FOOD_CATEGORIES = ["Burger", "Appetizer", "Dolci", "Altro"] as const;
+const DRINK_CATEGORIES = ["Cocktail", "Birre", "Vini", "Soft drink", "Altro"] as const;
 
 function toNumberOrNull(v: string): number | null {
   const n = Number(v);

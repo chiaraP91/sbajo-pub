@@ -47,35 +47,27 @@ type FoodMin = {
   name: string;
 };
 
-type MenuBundle = {
-  drinks: Drink[];
-  food: FoodMin[];
-};
-
-const SESSION_KEY = "sbajo:menuDrinkBundle:v3";
-const TTL_MS = 1000 * 60 * 10;
-
-function readSession<T>(key: string, ttlMs: number): T | null {
-  try {
-    const raw = sessionStorage.getItem(key);
-    if (!raw) return null;
-    const parsed = JSON.parse(raw) as { ts: number; data: T };
-    if (!parsed?.ts) return null;
-    if (Date.now() - parsed.ts > ttlMs) return null;
-    return parsed.data;
-  } catch {
-    return null;
-  }
-}
-
-function writeSession<T>(key: string, data: T) {
-  try {
-    sessionStorage.setItem(key, JSON.stringify({ ts: Date.now(), data }));
-  } catch {}
-}
-
 function normalizeCategory(cat: string | undefined) {
   return (cat ?? "altro").toLowerCase().trim();
+}
+
+function labelCategory(cat: string) {
+  // se vuoi label più “belle” per l’h2
+  if (cat === "soft drink") return "Soft drink";
+  return cat.charAt(0).toUpperCase() + cat.slice(1);
+}
+
+function priceSort(a: Drink, b: Drink) {
+  const ap = a.price;
+  const bp = b.price;
+
+  // null/undefined in fondo
+  if (ap == null && bp == null) return a.name.localeCompare(b.name);
+  if (ap == null) return 1;
+  if (bp == null) return -1;
+
+  if (ap !== bp) return ap - bp;
+  return a.name.localeCompare(b.name);
 }
 
 export default function MenuDrinkPage() {
@@ -91,15 +83,6 @@ export default function MenuDrinkPage() {
 
     const load = async () => {
       setError(null);
-
-      const cached = readSession<MenuBundle>(SESSION_KEY, TTL_MS);
-      if (cached) {
-        setDrinks(cached.drinks);
-        setFood(cached.food);
-        setLoading(false);
-        return;
-      }
-
       setLoading(true);
       setLoadingMsg("Sto caricando dal database…");
       setDrinks(null);
@@ -144,10 +127,6 @@ export default function MenuDrinkPage() {
 
         setDrinks(drinksData);
         setFood(foodData);
-
-        if (drinksData.length || foodData.length) {
-          writeSession<MenuBundle>(SESSION_KEY, { drinks: drinksData, food: foodData });
-        }
       } catch (e) {
         console.error("Firestore load error:", e);
         if (!alive) return;
@@ -172,13 +151,34 @@ export default function MenuDrinkPage() {
     return map;
   }, [food]);
 
-  const grouped = useMemo(() => {
-    return (drinks ?? []).reduce((acc, item) => {
+  // 1) raggruppa + 2) ordina gli item per prezzo dentro ogni gruppo
+  const groupedSorted = useMemo(() => {
+    const grouped = (drinks ?? []).reduce((acc, item) => {
       const cat = normalizeCategory(item.category);
       (acc[cat] ??= []).push(item);
       return acc;
     }, {} as Record<string, Drink[]>);
+
+    for (const k of Object.keys(grouped)) {
+      grouped[k] = [...grouped[k]].sort(priceSort);
+    }
+
+    return grouped;
   }, [drinks]);
+
+  // ordine gruppi fisso
+  const GROUP_ORDER = ["cocktail", "birre","vini" ,"soft drink", "altro" ] as const;
+
+  const orderedSections = useMemo(() => {
+    const keys = Object.keys(groupedSorted);
+
+    const known = GROUP_ORDER.filter((k) => keys.includes(k));
+    const others = keys
+      .filter((k) => !GROUP_ORDER.includes(k as any))
+      .sort((a, b) => a.localeCompare(b));
+
+    return [...known, ...others].map((k) => [k, groupedSorted[k]] as const);
+  }, [groupedSorted]);
 
   return (
     <div className={styles.wrapper}>
@@ -209,14 +209,12 @@ export default function MenuDrinkPage() {
           </div>
         ) : error ? (
           <p className={styles.empty}>{error}</p>
-        ) : Object.keys(grouped).length === 0 ? (
+        ) : orderedSections.length === 0 ? (
           <p className={styles.empty}>Il menu drink non è disponibile al momento.</p>
         ) : (
-          Object.entries(grouped).map(([tipologia, items]) => (
+          orderedSections.map(([tipologia, items]) => (
             <section key={tipologia} id={tipologia}>
-              <h2 className={styles.heading}>
-                {tipologia.charAt(0).toUpperCase() + tipologia.slice(1)}
-              </h2>
+              <h2 className={styles.heading}>{labelCategory(tipologia)}</h2>
 
               <ul className={styles.list}>
                 {items.map((item) => {
@@ -224,7 +222,11 @@ export default function MenuDrinkPage() {
                     item.linkToNumericId != null ? foodById.get(item.linkToNumericId) : undefined;
 
                   return (
-                    <li key={item.numericId} id={`drink-${item.numericId}`} className={styles.item}>
+                    <li
+                      key={item.numericId}
+                      id={`drink-${item.numericId}`}
+                      className={styles.item}
+                    >
                       <div className={styles.details}>
                         <h4 className={styles.nameItem}>{item.name}</h4>
                         {!!item.description && <p>{item.description}</p>}

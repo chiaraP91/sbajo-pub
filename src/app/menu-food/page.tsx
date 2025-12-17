@@ -15,8 +15,6 @@ const foodImages = [
   "/assets/img/snack.png",
 ];
 
-type MenuType = "food" | "drink";
-
 type FoodDoc = {
   numericId?: number;
   name?: string;
@@ -24,7 +22,7 @@ type FoodDoc = {
   category?: string;
   price?: number | null;
   prezzo?: number | null;
-  allergens?: number[]; // se li metterai
+  allergens?: number[];
   linkToNumericId?: number | null;
   disponibile?: boolean;
 };
@@ -51,35 +49,17 @@ type DrinkMin = {
   name: string;
 };
 
-type MenuBundle = {
-  menu: Food[];
-  drinks: DrinkMin[];
-};
-
-const SESSION_KEY = "sbajo:menuFoodBundle:v2";
-const TTL_MS = 1000 * 60 * 10;
-
-function readSession<T>(key: string, ttlMs: number): T | null {
-  try {
-    const raw = sessionStorage.getItem(key);
-    if (!raw) return null;
-    const parsed = JSON.parse(raw) as { ts: number; data: T };
-    if (!parsed?.ts) return null;
-    if (Date.now() - parsed.ts > ttlMs) return null;
-    return parsed.data;
-  } catch {
-    return null;
-  }
-}
-
-function writeSession<T>(key: string, data: T) {
-  try {
-    sessionStorage.setItem(key, JSON.stringify({ ts: Date.now(), data }));
-  } catch {}
-}
-
 function normalizeCategory(cat: string | undefined) {
   return (cat ?? "altro").toLowerCase().trim();
+}
+
+function labelCategory(cat: string) {
+  // se vuoi titoli più carini
+  if (cat === "appetizer") return "Appetizer";
+  if (cat === "burger") return "Burger";
+  if (cat === "dolci") return "Dolci";
+  if (cat === "altro") return "Altro";
+  return cat.charAt(0).toUpperCase() + cat.slice(1);
 }
 
 export default function MenuFoodPage() {
@@ -95,17 +75,6 @@ export default function MenuFoodPage() {
 
     const load = async () => {
       setError(null);
-
-      // 1) session cache
-      const cached = readSession<MenuBundle>(SESSION_KEY, TTL_MS);
-      if (cached) {
-        setMenu(cached.menu);
-        setDrinks(cached.drinks);
-        setLoading(false);
-        return;
-      }
-
-      // 2) fetch Firestore
       setLoading(true);
       setLoadingMsg("Sto caricando dal database…");
       setMenu(null);
@@ -123,6 +92,7 @@ export default function MenuFoodPage() {
           .map((d) => {
             const x = d.data() as FoodDoc;
             const numericId = Number(x.numericId ?? d.id);
+
             return {
               numericId,
               name: String(x.name ?? ""),
@@ -151,10 +121,6 @@ export default function MenuFoodPage() {
 
         setMenu(menuData);
         setDrinks(drinksData);
-
-        if (menuData.length || drinksData.length) {
-          writeSession<MenuBundle>(SESSION_KEY, { menu: menuData, drinks: drinksData });
-        }
       } catch (e) {
         console.error("Firestore load error:", e);
         if (!alive) return;
@@ -168,7 +134,6 @@ export default function MenuFoodPage() {
     };
 
     load();
-
     return () => {
       alive = false;
     };
@@ -196,6 +161,20 @@ export default function MenuFoodPage() {
       return acc;
     }, {} as Record<string, Food[]>);
   }, [menu]);
+
+  // ordine fisso macro-gruppi
+  const GROUP_ORDER = ["appetizer", "burger", "dolci", "altro"] as const;
+
+  const orderedSections = useMemo(() => {
+    const keys = Object.keys(grouped);
+
+    const known = GROUP_ORDER.filter((k) => keys.includes(k));
+    const others = keys
+      .filter((k) => !GROUP_ORDER.includes(k as any))
+      .sort((a, b) => a.localeCompare(b));
+
+    return [...known, ...others].map((k) => [k, grouped[k]] as const);
+  }, [grouped]);
 
   return (
     <div className={styles.wrapper}>
@@ -227,14 +206,12 @@ export default function MenuFoodPage() {
           </div>
         ) : error ? (
           <p className={styles.empty}>{error}</p>
-        ) : Object.keys(grouped).length === 0 ? (
+        ) : orderedSections.length === 0 ? (
           <p className={styles.empty}>Il menu non è disponibile al momento.</p>
         ) : (
-          Object.entries(grouped).map(([tipologia, items]) => (
+          orderedSections.map(([tipologia, items]) => (
             <section key={tipologia} id={tipologia}>
-              <h2 className={styles.heading}>
-                {tipologia.charAt(0).toUpperCase() + tipologia.slice(1)}
-              </h2>
+              <h2 className={styles.heading}>{labelCategory(tipologia)}</h2>
 
               <ul className={styles.list}>
                 {items.map((item) => {
