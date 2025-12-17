@@ -24,8 +24,8 @@ const DEFAULT_EVENTS: EventItem[] = [
     day: "20",
     month: "DICEMBRE",
     title: "Inaugurazione",
-    description: "Una serata per appassionati delle serate sbajate.",
-    imageUrl: "/assets/img/drink1.png",
+    description: "Una evento per gli appassionati delle serate sbajate.",
+    imageUrl: "/assets/img/locandina1.jpeg",
     cta: "Prenota il tuo posto",
     href: "/prenota"
   },

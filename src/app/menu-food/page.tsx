@@ -209,6 +209,7 @@ export default function MenuFoodPage() {
           <p className={styles.empty}>Il menu non è disponibile al momento.</p>
         ) : (
           Object.entries(grouped).map(([tipologia, items]) => (
+            console.log(grouped),
             <section key={tipologia} id={tipologia}>
               <h2 className={styles.heading}>
                 {tipologia.charAt(0).toUpperCase() + tipologia.slice(1)}
