@@ -5,6 +5,8 @@ import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import HeroCarousel from "@/components/HeroCarousel";
 import { useEffect, useMemo, useState } from "react";
+import { collection, getDocs } from "firebase/firestore";
+import { db } from "@/lib/firebase";
 
 const drinkImages = [
   "/assets/img/drink1.png",
@@ -13,30 +15,45 @@ const drinkImages = [
   "/assets/img/drink4.png",
 ];
 
-interface Drink {
-  id: number;
-  documentId: string;
-  nome: string;
-  descrizione: string | null;
-  prezzo: number;
-  tipologia?: string;
+type DrinkDoc = {
+  numericId?: number;
+  name?: string;
+  description?: string;
+  category?: string;
+  prezzo?: number | null;
+  price?: number | null;
+  linkToNumericId?: number | null;
+  disponibile?: boolean;
+};
 
-  coll_food?: string | null; // documentId del food
-}
+type FoodDoc = {
+  numericId?: number;
+  name?: string;
+  disponibile?: boolean;
+};
 
-interface FoodMin {
-  id: number;
-  documentId: string;
-  nome: string;
-}
+type Drink = {
+  numericId: number;
+  name: string;
+  description: string;
+  category: string;
+  price: number | null;
+  linkToNumericId: number | null;
+  disponibile: boolean;
+};
+
+type FoodMin = {
+  numericId: number;
+  name: string;
+};
 
 type MenuBundle = {
   drinks: Drink[];
   food: FoodMin[];
 };
 
-const SESSION_KEY = "sbajo:menuDrinkBundle:v1";
-const TTL_MS = 1000 * 60 * 10; // 10 minuti
+const SESSION_KEY = "sbajo:menuDrinkBundle:v3";
+const TTL_MS = 1000 * 60 * 10;
 
 function readSession<T>(key: string, ttlMs: number): T | null {
   try {
@@ -54,22 +71,11 @@ function readSession<T>(key: string, ttlMs: number): T | null {
 function writeSession<T>(key: string, data: T) {
   try {
     sessionStorage.setItem(key, JSON.stringify({ ts: Date.now(), data }));
-  } catch {
-    // storage pieno/bloccato: pace
-  }
+  } catch {}
 }
 
-async function fetchJson(url: string, timeoutMs = 20000) {
-  const controller = new AbortController();
-  const t = setTimeout(() => controller.abort(), timeoutMs);
-
-  try {
-    const r = await fetch(url, { signal: controller.signal, cache: "no-store" });
-    if (!r.ok) throw new Error(`HTTP ${r.status}`);
-    return await r.json();
-  } finally {
-    clearTimeout(t);
-  }
+function normalizeCategory(cat: string | undefined) {
+  return (cat ?? "altro").toLowerCase().trim();
 }
 
 export default function MenuDrinkPage() {
@@ -86,7 +92,6 @@ export default function MenuDrinkPage() {
     const load = async () => {
       setError(null);
 
-      // 1) sessione
       const cached = readSession<MenuBundle>(SESSION_KEY, TTL_MS);
       if (cached) {
         setDrinks(cached.drinks);
@@ -95,42 +100,60 @@ export default function MenuDrinkPage() {
         return;
       }
 
-      // 2) fetch con loader
       setLoading(true);
-      setLoadingMsg("Sto aspettando il server del menu drink…");
+      setLoadingMsg("Sto caricando dal database…");
       setDrinks(null);
       setFood(null);
 
       try {
-        const [drinkRes, foodRes] = await Promise.allSettled([
-          fetchJson("https://supportive-flame-83924d0cf8.strapiapp.com/api/menu-drinks"),
-          fetchJson("https://supportive-flame-83924d0cf8.strapiapp.com/api/menus"),
+        const [drinkSnap, foodSnap] = await Promise.all([
+          getDocs(collection(db, "menu-drink")),
+          getDocs(collection(db, "menu-food")),
         ]);
 
         if (!alive) return;
 
-        const drinksData: Drink[] =
-          drinkRes.status === "fulfilled" ? (drinkRes.value?.data ?? []) : [];
+        const drinksData: Drink[] = drinkSnap.docs
+          .map((d) => {
+            const x = d.data() as DrinkDoc;
+            const numericId = Number(x.numericId ?? d.id);
+            return {
+              numericId,
+              name: String(x.name ?? ""),
+              description: String(x.description ?? ""),
+              category: String(x.category ?? "altro"),
+              price: (x.price ?? x.prezzo ?? null) as number | null,
+              linkToNumericId: (x.linkToNumericId ?? null) as number | null,
+              disponibile: x.disponibile !== false,
+            };
+          })
+          .filter((x) => Number.isFinite(x.numericId) && x.name && x.disponibile);
 
-        const foodData: FoodMin[] =
-          foodRes.status === "fulfilled" ? (foodRes.value?.data ?? []) : [];
+        const foodData: FoodMin[] = foodSnap.docs
+          .map((d) => {
+            const x = d.data() as FoodDoc;
+            const numericId = Number(x.numericId ?? d.id);
+            return {
+              numericId,
+              name: String(x.name ?? ""),
+              disponibile: x.disponibile !== false,
+            };
+          })
+          .filter((x) => Number.isFinite(x.numericId) && x.name && (x as any).disponibile)
+          .map(({ numericId, name }) => ({ numericId, name }));
 
         setDrinks(drinksData);
         setFood(foodData);
 
-        // salva solo se ho almeno qualcosa (evita cache “vuota” se server dorme)
         if (drinksData.length || foodData.length) {
           writeSession<MenuBundle>(SESSION_KEY, { drinks: drinksData, food: foodData });
         }
-
-        if (drinkRes.status === "rejected" && foodRes.status === "rejected") {
-          setError("Il server non risponde (o si sta svegliando). Riprova tra poco.");
-        }
-      } catch {
+      } catch (e) {
+        console.error("Firestore load error:", e);
         if (!alive) return;
         setDrinks([]);
         setFood([]);
-        setError("Errore di rete durante il caricamento del menu drink.");
+        setError("Errore durante il caricamento del menu drink da Firebase.");
       } finally {
         if (!alive) return;
         setLoading(false);
@@ -138,23 +161,20 @@ export default function MenuDrinkPage() {
     };
 
     load();
-
     return () => {
       alive = false;
     };
   }, []);
 
-  // mappa documentId food -> food
-  const foodByDocumentId = useMemo(() => {
-    const map = new Map<string, FoodMin>();
-    (food ?? []).forEach((p) => map.set(p.documentId, p));
+  const foodById = useMemo(() => {
+    const map = new Map<number, FoodMin>();
+    (food ?? []).forEach((p) => map.set(p.numericId, p));
     return map;
   }, [food]);
 
-  // grouping per tipologia
   const grouped = useMemo(() => {
     return (drinks ?? []).reduce((acc, item) => {
-      const cat = item.tipologia?.toLowerCase().trim() || "altro";
+      const cat = normalizeCategory(item.category);
       (acc[cat] ??= []).push(item);
       return acc;
     }, {} as Record<string, Drink[]>);
@@ -164,7 +184,6 @@ export default function MenuDrinkPage() {
     <div className={styles.wrapper}>
       <HeroCarousel images={drinkImages} />
       <div className={styles.scrim} aria-hidden="true" />
-
       <Header />
 
       <main className={styles.scrollArea}>
@@ -194,7 +213,6 @@ export default function MenuDrinkPage() {
           <p className={styles.empty}>Il menu drink non è disponibile al momento.</p>
         ) : (
           Object.entries(grouped).map(([tipologia, items]) => (
-            console.log(grouped),
             <section key={tipologia} id={tipologia}>
               <h2 className={styles.heading}>
                 {tipologia.charAt(0).toUpperCase() + tipologia.slice(1)}
@@ -202,37 +220,34 @@ export default function MenuDrinkPage() {
 
               <ul className={styles.list}>
                 {items.map((item) => {
-                  const piatto = item.coll_food
-                    ? foodByDocumentId.get(item.coll_food)
-                    : undefined;
+                  const piatto =
+                    item.linkToNumericId != null ? foodById.get(item.linkToNumericId) : undefined;
 
                   return (
-                    <li
-                      key={item.documentId}
-                      id={`drink-${item.documentId}`}
-                      className={styles.item}
-                    >
+                    <li key={item.numericId} id={`drink-${item.numericId}`} className={styles.item}>
                       <div className={styles.details}>
-                        <h4 className={styles.nameItem}>{item.nome}</h4>
-                        {item.descrizione && <p>{item.descrizione}</p>}
+                        <h4 className={styles.nameItem}>{item.name}</h4>
+                        {!!item.description && <p>{item.description}</p>}
 
                         {piatto && (
                           <div className={styles.pairing}>
                             <span className={styles.pairingLabel}>Provalo con:</span>
                             <a
-                              href={`/menu-food#food-${piatto.documentId}`}
+                              href={`/menu-food#food-${piatto.numericId}`}
                               className={styles.pairingCard}
-                              aria-label={`Vedi ${piatto.nome} nel menu food`}
+                              aria-label={`Vedi ${piatto.name} nel menu food`}
                             >
                               <span className={styles.pairingIcon}>🍴</span>
-                              <span className={styles.pairingText}>{piatto.nome}</span>
+                              <span className={styles.pairingText}>{piatto.name}</span>
                               <span className={styles.pairingArrow}>›</span>
                             </a>
                           </div>
                         )}
                       </div>
 
-                      <span className={styles.price}>€{item.prezzo}</span>
+                      <span className={styles.price}>
+                        {item.price != null ? `€${item.price}` : ""}
+                      </span>
                     </li>
                   );
                 })}

@@ -4,13 +4,15 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build" ,
+    "build": "next build",
     "start": "next start",
     "lint": "eslint"
   },
   "dependencies": {
     "@netlify/plugin-nextjs": "^5.14.5",
     "classnames": "^2.5.1",
+    "firebase": "^12.7.0",
+    "firebase-admin": "^13.6.0",
     "next": "^16.0.10",
     "react": "19.2.0",
     "react-dom": "19.2.0",

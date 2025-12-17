@@ -1,0 +1,112 @@
+[
+  {
+    "numericId": 29,
+    "menuType": "drink",
+    "name": "Gin/vodka lemon",
+    "description": "",
+    "category": "Cocktail",
+    "allergens": [],
+    "price": null,
+    "linkToNumericId": null,
+    "disponibile": true
+  },
+  {
+    "numericId": 9,
+    "menuType": "drink",
+    "name": "Camping with dad",
+    "description": "Jameson infuso al bacon, Chocolate bitters e Z...",
+    "category": "Cocktail",
+    "allergens": [],
+    "price": null,
+    "linkToNumericId": null,
+    "disponibile": true
+  },
+  {
+    "numericId": 7,
+    "menuType": "drink",
+    "name": "Ferrari",
+    "description": "Spicy Campari, Carpano vermouth e Beefeader...",
+    "category": "Cocktail",
+    "allergens": [],
+    "price": null,
+    "linkToNumericId": null,
+    "disponibile": true
+  },
+  {
+    "numericId": 24,
+    "menuType": "drink",
+    "name": "Rum e cola",
+    "description": "Gin/ vodka lemon",
+    "category": "Cocktail",
+    "allergens": [],
+    "price": null,
+    "linkToNumericId": null,
+    "disponibile": true
+  },
+  {
+    "numericId": 32,
+    "menuType": "drink",
+    "name": "Gin/vodka tonic",
+    "description": "",
+    "category": "Cocktail",
+    "allergens": [],
+    "price": null,
+    "linkToNumericId": null,
+    "disponibile": true
+  },
+  {
+    "numericId": 13,
+    "menuType": "drink",
+    "name": "L'inganno della cadregha",
+    "description": "Pisco , Cordiale alla mela e Zucchero",
+    "category": "Cocktail",
+    "allergens": [],
+    "price": null,
+    "linkToNumericId": null,
+    "disponibile": true
+  },
+  {
+    "numericId": 11,
+    "menuType": "drink",
+    "name": "Steve Irwin",
+    "description": "Rum mix, Liquore Al mango, Ananas e Lime",
+    "category": "Cocktail",
+    "allergens": [],
+    "price": null,
+    "linkToNumericId": null,
+    "disponibile": true
+  },
+  {
+    "numericId": 5,
+    "menuType": "drink",
+    "name": "birra artigianale",
+    "description": "birra dei monaci di sto cazzo",
+    "category": "birre",
+    "allergens": [],
+    "price": null,
+    "linkToNumericId": null,
+    "disponibile": true
+  },
+  {
+    "numericId": 3,
+    "menuType": "drink",
+    "name": "acqua frizzante",
+    "description": "acqua",
+    "category": "soft drink",
+    "allergens": [],
+    "price": null,
+    "linkToNumericId": null,
+    "disponibile": true
+  },
+  {
+    "numericId": 1,
+    "menuType": "drink",
+    "name": "coca cola",
+    "description": "coca cola lattina",
+    "category": "soft drink",
+    "allergens": [],
+    "price": null,
+    "linkToNumericId": null,
+    "disponibile": true
+  }
+]

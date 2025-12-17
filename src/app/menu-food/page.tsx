@@ -5,6 +5,8 @@ import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import HeroCarousel from "@/components/HeroCarousel";
 import { useEffect, useMemo, useState } from "react";
+import { collection, getDocs } from "firebase/firestore";
+import { db } from "@/lib/firebase";
 
 const foodImages = [
   "/assets/img/pasta.png",
@@ -13,38 +15,49 @@ const foodImages = [
   "/assets/img/snack.png",
 ];
 
-interface Allergene {
-  id: number;
-  nome: string | null;
-  codice: string | number | null;
-}
+type MenuType = "food" | "drink";
 
-interface Piatto {
-  id: number;
-  ref_id: string;
-  nome: string;
-  descrizione: string | null;
-  prezzo: number;
-  allergeni?: Allergene[];
-  tipologia?: string;
+type FoodDoc = {
+  numericId?: number;
+  name?: string;
+  description?: string;
+  category?: string;
+  price?: number | null;
+  prezzo?: number | null;
+  allergens?: number[]; // se li metterai
+  linkToNumericId?: number | null;
+  disponibile?: boolean;
+};
 
-  coll_food?: string | null;
-  coll_drink?: string | null;
-}
+type DrinkDoc = {
+  numericId?: number;
+  name?: string;
+  disponibile?: boolean;
+};
 
-interface DrinkMin {
-  id: number;
-  ref_id: string;
-  nome: string;
-}
+type Food = {
+  numericId: number;
+  name: string;
+  description: string;
+  category: string;
+  price: number | null;
+  allergens: number[];
+  linkToNumericId: number | null;
+  disponibile: boolean;
+};
+
+type DrinkMin = {
+  numericId: number;
+  name: string;
+};
 
 type MenuBundle = {
-  menu: Piatto[];
+  menu: Food[];
   drinks: DrinkMin[];
 };
 
-const SESSION_KEY = "sbajo:menuFoodBundle:v1";
-const TTL_MS = 1000 * 60 * 10; // 10 minuti
+const SESSION_KEY = "sbajo:menuFoodBundle:v2";
+const TTL_MS = 1000 * 60 * 10;
 
 function readSession<T>(key: string, ttlMs: number): T | null {
   try {
@@ -62,26 +75,15 @@ function readSession<T>(key: string, ttlMs: number): T | null {
 function writeSession<T>(key: string, data: T) {
   try {
     sessionStorage.setItem(key, JSON.stringify({ ts: Date.now(), data }));
-  } catch {
-    // storage pieno / bloccato: amen
-  }
+  } catch {}
 }
 
-async function fetchJson(url: string, timeoutMs = 20000) {
-  const controller = new AbortController();
-  const t = setTimeout(() => controller.abort(), timeoutMs);
-
-  try {
-    const r = await fetch(url, { signal: controller.signal, cache: "no-store" });
-    if (!r.ok) throw new Error(`HTTP ${r.status}`);
-    return await r.json();
-  } finally {
-    clearTimeout(t);
-  }
+function normalizeCategory(cat: string | undefined) {
+  return (cat ?? "altro").toLowerCase().trim();
 }
 
 export default function MenuFoodPage() {
-  const [menu, setMenu] = useState<Piatto[] | null>(null);
+  const [menu, setMenu] = useState<Food[] | null>(null);
   const [drinks, setDrinks] = useState<DrinkMin[] | null>(null);
 
   const [loading, setLoading] = useState(true);
@@ -94,7 +96,7 @@ export default function MenuFoodPage() {
     const load = async () => {
       setError(null);
 
-      // 1) Prova sessione
+      // 1) session cache
       const cached = readSession<MenuBundle>(SESSION_KEY, TTL_MS);
       if (cached) {
         setMenu(cached.menu);
@@ -103,42 +105,62 @@ export default function MenuFoodPage() {
         return;
       }
 
-      // 2) Niente cache: fetch + loader
+      // 2) fetch Firestore
       setLoading(true);
-      setLoadingMsg("Sto aspettando il server del menu…");
+      setLoadingMsg("Sto caricando dal database…");
       setMenu(null);
       setDrinks(null);
 
       try {
-        const [foodRes, drinkRes] = await Promise.allSettled([
-          fetchJson("https://supportive-flame-83924d0cf8.strapiapp.com/api/menus"),
-          fetchJson("https://supportive-flame-83924d0cf8.strapiapp.com/api/menu-drinks"),
+        const [foodSnap, drinkSnap] = await Promise.all([
+          getDocs(collection(db, "menu-food")),
+          getDocs(collection(db, "menu-drink")),
         ]);
 
         if (!alive) return;
 
-        const menuData: Piatto[] =
-          foodRes.status === "fulfilled" ? (foodRes.value?.data ?? []) : [];
+        const menuData: Food[] = foodSnap.docs
+          .map((d) => {
+            const x = d.data() as FoodDoc;
+            const numericId = Number(x.numericId ?? d.id);
+            return {
+              numericId,
+              name: String(x.name ?? ""),
+              description: String(x.description ?? ""),
+              category: String(x.category ?? "altro"),
+              price: (x.price ?? x.prezzo ?? null) as number | null,
+              allergens: Array.isArray(x.allergens) ? x.allergens : [],
+              linkToNumericId: (x.linkToNumericId ?? null) as number | null,
+              disponibile: x.disponibile !== false,
+            };
+          })
+          .filter((x) => Number.isFinite(x.numericId) && x.name && x.disponibile);
 
-        const drinksData: DrinkMin[] =
-          drinkRes.status === "fulfilled" ? (drinkRes.value?.data ?? []) : [];
+        const drinksData: DrinkMin[] = drinkSnap.docs
+          .map((d) => {
+            const x = d.data() as DrinkDoc;
+            const numericId = Number(x.numericId ?? d.id);
+            return {
+              numericId,
+              name: String(x.name ?? ""),
+              disponibile: x.disponibile !== false,
+            };
+          })
+          .filter((x) => Number.isFinite(x.numericId) && x.name && (x as any).disponibile)
+          .map(({ numericId, name }) => ({ numericId, name }));
 
         setMenu(menuData);
         setDrinks(drinksData);
 
-        // salva in sessione se ho qualcosa (altrimenti rischi di “cachare il vuoto”)
         if (menuData.length || drinksData.length) {
           writeSession<MenuBundle>(SESSION_KEY, { menu: menuData, drinks: drinksData });
         }
-
-        if (foodRes.status === "rejected" && drinkRes.status === "rejected") {
-          setError("Il server non risponde (o si sta svegliando). Riprova tra poco.");
-        }
-      } catch {
+      } catch (e) {
+        console.error("Firestore load error:", e);
         if (!alive) return;
         setMenu([]);
         setDrinks([]);
-        setError("Errore di rete durante il caricamento del menu.");
+        setError("Errore durante il caricamento del menu da Firebase.");
       } finally {
         if (!alive) return;
         setLoading(false);
@@ -152,27 +174,27 @@ export default function MenuFoodPage() {
     };
   }, []);
 
-  // map drink per ref_id
-  const drinkByDocumentId = useMemo(() => {
-    const map = new Map<string, DrinkMin>();
-    (drinks ?? []).forEach((d) => map.set(d.ref_id, d));
+  // map drink per numericId
+  const drinkById = useMemo(() => {
+    const map = new Map<number, DrinkMin>();
+    (drinks ?? []).forEach((d) => map.set(d.numericId, d));
     return map;
   }, [drinks]);
 
-  // map food per ref_id
-  const foodByDocumentId = useMemo(() => {
-    const map = new Map<string, Piatto>();
-    (menu ?? []).forEach((p) => map.set(p.ref_id, p));
+  // map food per numericId
+  const foodById = useMemo(() => {
+    const map = new Map<number, Food>();
+    (menu ?? []).forEach((p) => map.set(p.numericId, p));
     return map;
   }, [menu]);
 
-  // grouping per tipologia
-  const grouped: Record<string, Piatto[]> = useMemo(() => {
+  // grouping per category
+  const grouped = useMemo(() => {
     return (menu ?? []).reduce((acc, item) => {
-      const cat = item.tipologia?.toLowerCase().trim() || "altro";
+      const cat = normalizeCategory(item.category);
       (acc[cat] ??= []).push(item);
       return acc;
-    }, {} as Record<string, Piatto[]>);
+    }, {} as Record<string, Food[]>);
   }, [menu]);
 
   return (
@@ -199,7 +221,7 @@ export default function MenuFoodPage() {
               />
               <p style={{ margin: 0 }}>{loadingMsg}</p>
               <p style={{ margin: 0, opacity: 0.75, fontSize: 12 }}>
-                Si è lento... non è uno sbajo.
+                Se è lento... non è uno sbajo.
               </p>
             </div>
           </div>
@@ -209,7 +231,6 @@ export default function MenuFoodPage() {
           <p className={styles.empty}>Il menu non è disponibile al momento.</p>
         ) : (
           Object.entries(grouped).map(([tipologia, items]) => (
-            console.log(grouped),
             <section key={tipologia} id={tipologia}>
               <h2 className={styles.heading}>
                 {tipologia.charAt(0).toUpperCase() + tipologia.slice(1)}
@@ -217,47 +238,42 @@ export default function MenuFoodPage() {
 
               <ul className={styles.list}>
                 {items.map((item) => {
-                  const linkedFood = item.coll_food
-                    ? foodByDocumentId.get(item.coll_food)
-                    : undefined;
+                  const linkedFood =
+                    item.linkToNumericId != null ? foodById.get(item.linkToNumericId) : undefined;
 
-                  const linkedDrink = item.coll_drink
-                    ? drinkByDocumentId.get(item.coll_drink)
-                    : undefined;
+                  const linkedDrink =
+                    item.linkToNumericId != null ? drinkById.get(item.linkToNumericId) : undefined;
 
                   return (
                     <li
-                      key={item.ref_id}
-                      id={`food-${item.ref_id}`}
+                      key={item.numericId}
+                      id={`food-${item.numericId}`}
                       className={styles.item}
                     >
                       <div className={styles.details}>
                         <h4 className={styles.nameItem}>
-                          {item.nome}
-                          {item.allergeni && item.allergeni.length > 0 && (
+                          {item.name}
+                          {item.allergens.length > 0 && (
                             <span className={styles.codes}>
-                              [{" "}
-                              {item.allergeni
-                                .filter((a) => a?.nome)
-                                .map((a) => a.nome)
-                                .join(", ")}
-                              {" ]"}
+                              {" ["}
+                              {item.allergens.join(", ")}
+                              {"]"}
                             </span>
                           )}
                         </h4>
 
-                        {item.descrizione && <p>{item.descrizione}</p>}
+                        {!!item.description && <p>{item.description}</p>}
 
                         {linkedFood && (
                           <div className={styles.pairing}>
                             <span className={styles.pairingLabel}>Provalo con:</span>
                             <a
-                              href={`/menu-food#food-${linkedFood.ref_id}`}
+                              href={`/menu-food#food-${linkedFood.numericId}`}
                               className={styles.pairingCard}
-                              aria-label={`Vedi ${linkedFood.nome} nel menu food`}
+                              aria-label={`Vedi ${linkedFood.name} nel menu food`}
                             >
                               <span className={styles.pairingIcon}>🍴</span>
-                              <span className={styles.pairingText}>{linkedFood.nome}</span>
+                              <span className={styles.pairingText}>{linkedFood.name}</span>
                               <span className={styles.pairingArrow}>›</span>
                             </a>
                           </div>
@@ -267,19 +283,21 @@ export default function MenuFoodPage() {
                           <div className={styles.pairing}>
                             <span className={styles.pairingLabel}>Consigliato con</span>
                             <a
-                              href={`/menu-drink#drink-${linkedDrink.ref_id}`}
+                              href={`/menu-drink#drink-${linkedDrink.numericId}`}
                               className={styles.pairingCard}
-                              aria-label={`Vedi ${linkedDrink.nome} nel menu drink`}
+                              aria-label={`Vedi ${linkedDrink.name} nel menu drink`}
                             >
                               <span className={styles.pairingIcon}>🍸</span>
-                              <span className={styles.pairingText}>{linkedDrink.nome}</span>
+                              <span className={styles.pairingText}>{linkedDrink.name}</span>
                               <span className={styles.pairingArrow}>›</span>
                             </a>
                           </div>
                         )}
                       </div>
 
-                      <span className={styles.price}>€{item.prezzo}</span>
+                      <span className={styles.price}>
+                        {item.price != null ? `€${item.price}` : ""}
+                      </span>
                     </li>
                   );
                 })}
@@ -291,10 +309,11 @@ export default function MenuFoodPage() {
 
       <Footer />
 
-      {/* keyframes inline, così non ti obbligo a toccare SCSS se non vuoi */}
       <style jsx global>{`
         @keyframes spin {
-          to { transform: rotate(360deg); }
+          to {
+            transform: rotate(360deg);
+          }
         }
       `}</style>
     </div>

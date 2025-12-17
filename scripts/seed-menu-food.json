@@ -1,0 +1,112 @@
+[
+  {
+    "numericId": 18,
+    "menuType": "food",
+    "name": "Barbie Samosa",
+    "description": "Deliziosi triangolini di pasta sfoglia con un ripi...",
+    "category": "Appetizer",
+    "allergens": [],
+    "price": null,
+    "linkToNumericId": null,
+    "published": true
+  },
+  {
+    "numericId": 39,
+    "menuType": "food",
+    "name": "Dubai mochi",
+    "description": "Mochi fusion con un ripieno in stile Dubai cho...",
+    "category": "Dolce",
+    "allergens": [],
+    "price": null,
+    "linkToNumericId": null,
+    "published": true
+  },
+  {
+    "numericId": 15,
+    "menuType": "food",
+    "name": "Fish-In-Chips",
+    "description": "Bun con burger di merluzzo",
+    "category": "Burger",
+    "allergens": [],
+    "price": null,
+    "linkToNumericId": null,
+    "published": false
+  },
+  {
+    "numericId": 41,
+    "menuType": "food",
+    "name": "Formaggio torta",
+    "description": "Cheesecake fatta da noi al caramello salato",
+    "category": "Dolce",
+    "allergens": [],
+    "price": null,
+    "linkToNumericId": null,
+    "published": true
+  },
+  {
+    "numericId": 4,
+    "menuType": "food",
+    "name": "Fries",
+    "description": "Le intramontabili patatine fritte",
+    "category": "Appetizer",
+    "allergens": [],
+    "price": null,
+    "linkToNumericId": null,
+    "published": true
+  },
+  {
+    "numericId": 29,
+    "menuType": "food",
+    "name": "Fries",
+    "description": "Le intramontabili patatine fritte",
+    "category": "Appetizer",
+    "allergens": [],
+    "price": null,
+    "linkToNumericId": null,
+    "published": false
+  },
+  {
+    "numericId": 43,
+    "menuType": "food",
+    "name": "Jurassic cake",
+    "description": "Panna cotta al bergamotto coperta da una terr...",
+    "category": "Dolce",
+    "allergens": [],
+    "price": null,
+    "linkToNumericId": null,
+    "published": true
+  },
+  {
+    "numericId": 20,
+    "menuType": "food",
+    "name": "Meatballs (no spaghetti)",
+    "description": "Polpettine di manzo homemade speziate al pu...",
+    "category": "Appetizer",
+    "allergens": [],
+    "price": null,
+    "linkToNumericId": null,
+    "published": true
+  },
+  {
+    "numericId": 37,
+    "menuType": "food",
+    "name": "Miel poll",
+    "description": "Tenere crocchette di pollo panate in famosi cer...",
+    "category": "Appetizer",
+    "allergens": [],
+    "price": null,
+    "linkToNumericId": null,
+    "published": true
+  },
+  {
+    "numericId": 11,
+    "menuType": "food",
+    "name": "Pearl Harbor",
+    "description": "Smash burger di manzo servito in un morbido ...",
+    "category": "Burger",
+    "allergens": [],
+    "price": null,
+    "linkToNumericId": null,
+    "published": true
+  }
+]
