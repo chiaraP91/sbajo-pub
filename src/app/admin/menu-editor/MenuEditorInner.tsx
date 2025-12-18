@@ -61,8 +61,8 @@ const ALLERGENS: Array<{ code: number; label: string }> = [
   { code: 14, label: "Molluschi" },
 ];
 
-const FOOD_CATEGORIES = ["Panini", "Fritti", "Taglieri", "Dolci", "Altro"] as const;
-const DRINK_CATEGORIES = ["Cocktail", "Birre", "Vini", "Analcolici", "Altro"] as const;
+const FOOD_CATEGORIES =  ["Appetizer", "Burger", "Dolci", "Altro"] as const;
+const DRINK_CATEGORIES =  ["Cocktail", "Birre","Vini" ,"Soft drink", "Altro" ] as const;
 
 function toNumberOrNull(v: string): number | null {
   const n = Number(v);
@@ -426,10 +426,6 @@ export default function MenuEditorInner() {
                   {saving ? "Salvataggio…" : isEdit ? "Salva modifiche" : "Salva su Firestore"}
                 </button>
 
-                <button type="button" className={s.btn} onClick={refreshLinkLists} disabled={saving || loadingList}>
-                  Aggiorna liste
-                </button>
-
                 <button type="button" className={s.btn} onClick={() => router.push("/admin/table-menu")}>
                   Vai a table-menu
                 </button>
@@ -438,9 +434,6 @@ export default function MenuEditorInner() {
           </div>
 
           <hr className={s.hr} />
-          <p className={s.subtitle} style={{ marginTop: 0 }}>
-            Niente lista qui sotto: la trovi su <strong>/admin/table-menu</strong>.
-          </p>
         </div>
       </div>
     </AdminGate>

@@ -150,9 +150,6 @@ export default function AvailabilityPage() {
             <div className={s.page}>
                 <div className={s.container}>
                     <h1 className={s.title}>Disponibilità menu</h1>
-                    <p className={s.subtitle}>
-                        Spunta per rendere disponibile (o no). Aggiorna direttamente Firestore.
-                    </p>
 
                     {err && <div className={`${s.notice} ${s.noticeErr}`}>{err}</div>}
                     {msg && <div className={`${s.notice} ${s.noticeOk}`}>{msg}</div>}

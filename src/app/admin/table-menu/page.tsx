@@ -149,14 +149,8 @@ export default function TableMenuPage() {
 
           <div className={s.card}>
             <div className={s.actions} style={{ marginTop: 0 }}>
-              <button className={`${s.btn} ${s.btnPrimary}`} onClick={() => goCreate("food")}>
-                + Nuovo Food
-              </button>
               <button className={`${s.btn} ${s.btnPrimary}`} onClick={() => goCreate("drink")}>
-                + Nuovo Drink
-              </button>
-              <button className={s.btn} onClick={refresh} disabled={loading}>
-                {loading ? "Aggiorno…" : "Aggiorna lista"}
+                + Nuovo
               </button>
               <button className={`${s.btn} ${s.btnPrimary}`} onClick={() => goDisponibilita()}>
                 Disponibilità
@@ -196,17 +190,14 @@ export default function TableMenuPage() {
                           ) : (
                             <span className={`${s.badge} ${s.badgeMuted}`}>Disponibilità: -</span>
                           )}
-
-                          {row.description ? (
-                            <span className={`${s.badge} ${s.badgeMuted}`}>
-                              {row.description.length > 40
-                                ? row.description.slice(0, 40) + "…"
-                                : row.description}
-                            </span>
-                          ) : (
-                            <span className={`${s.badge} ${s.badgeMuted}`}>Descrizione: -</span>
-                          )}
                         </div>
+
+                        {row.description && (
+                          <div className={s.descriptionRow}>
+                            {row.description}
+                          </div>
+                        )}
+
                       </div>
 
                       <div style={{ display: "flex", gap: 10, alignItems: "center" }}>

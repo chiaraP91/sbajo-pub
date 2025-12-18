@@ -39,11 +39,6 @@ const EventiPage: React.FC<EventsSectionProps> = ({ events }) => {
       <Header />
       <div className={styles.eventsHeader}>
         <h2 className={styles.eventsTitle}>Eventi Sbajati</h2>
-        <p className={styles.eventsSubtitle}>
-          Dove anche la serata prende una piega diversa.
-          <br />
-          Cocktail speciali, musica dal vivo e cose che non ti aspetti.
-        </p>
       </div>
 
       <div className={styles.eventsList}>

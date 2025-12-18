@@ -198,6 +198,7 @@ $ok: rgba(130, 255, 170, 0.9);
   justify-content: space-between;
   gap: 10px;
   align-items: flex-start;
+  flex-direction: column;
 }
 
 .itemTitle {
@@ -232,4 +233,17 @@ $ok: rgba(130, 255, 170, 0.9);
   .formGrid {
     grid-template-columns: 1fr;
   }
+}
+
+.descriptionRow {
+  margin-top: 8px;
+  padding: 10px 12px;
+  width: 100%;
+
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 10px;
+  border-left: 2px solid rgba(215,181,109,.6);
+  font-size: 13px;
+  line-height: 1.4;
+  opacity: 0.9;
 }
