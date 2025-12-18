@@ -61,8 +61,8 @@ const ALLERGENS: Array<{ code: number; label: string }> = [
   { code: 14, label: "Molluschi" },
 ];
 
-const FOOD_CATEGORIES =  ["Appetizer", "Burger", "Dolci", "Altro"] as const;
-const DRINK_CATEGORIES =  ["Cocktail", "Birre","Vini" ,"Soft drink", "Altro" ] as const;
+const FOOD_CATEGORIES = ["Appetizer", "Burger", "Dolci", "Altro"] as const;
+const DRINK_CATEGORIES = ["Cocktail", "Birre", "Vini", "Soft drink", "Altro"] as const;
 
 function toNumberOrNull(v: string): number | null {
   const n = Number(v);
@@ -202,9 +202,11 @@ export default function MenuEditorInner() {
     loadEdit();
   }, [isEdit, editType, editId]);
 
-  function onAllergensChange(e: React.ChangeEvent<HTMLSelectElement>) {
-    const selected = Array.from(e.target.selectedOptions).map((o) => Number(o.value));
-    setAllergens(selected.filter((n) => Number.isFinite(n)));
+
+  function toggleAllergen(code: number) {
+    setAllergens((prev) =>
+      prev.includes(code) ? prev.filter((x) => x !== code) : [...prev, code]
+    );
   }
 
   const foodOptions = useMemo(
@@ -380,13 +382,23 @@ export default function MenuEditorInner() {
 
               <label className={s.field}>
                 <span className={s.label}>Allergeni (multi-selezione)</span>
-                <select className={s.select} multiple value={allergens.map(String)} onChange={onAllergensChange} size={6}>
-                  {ALLERGENS.map((a) => (
-                    <option key={a.code} value={a.code}>
-                      {a.code} · {a.label}
-                    </option>
-                  ))}
-                </select>
+                <div className={s.allergenGrid}>
+                  {ALLERGENS.map((a) => {
+                    const code = Number(a.code);
+                    const checked = allergens.includes(code);
+
+                    return (
+                      <label key={a.code} className={s.allergenItem} style={{ paddingLeft: 10 }}>
+                        <input
+                          type="checkbox"
+                          checked={checked}
+                          onChange={() => toggleAllergen(code)}
+                        />
+                        <span  style={{ paddingLeft: 10 }}>{a.code} · {a.label}</span>
+                      </label>
+                    );
+                  })}
+                </div>
                 <p className={s.hint}>Tip: Ctrl/Cmd per selezionare più voci.</p>
               </label>
 

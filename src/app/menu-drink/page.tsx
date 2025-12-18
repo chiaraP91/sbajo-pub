@@ -22,6 +22,7 @@ type DrinkDoc = {
   category?: string;
   prezzo?: number | null;
   price?: number | null;
+  allergens?: string[];
   linkToNumericId?: number | null;
   disponibile?: boolean;
 };
@@ -38,6 +39,7 @@ type Drink = {
   description: string;
   category: string;
   price: number | null;
+  allergens: string[];
   linkToNumericId: number | null;
   disponibile: boolean;
 };
@@ -69,6 +71,28 @@ function priceSort(a: Drink, b: Drink) {
   if (ap !== bp) return ap - bp;
   return a.name.localeCompare(b.name);
 }
+
+export const ALLERGENS = [
+  { code: 1, label: "Glutine" },
+  { code: 2, label: "Crostacei" },
+  { code: 3, label: "Uova" },
+  { code: 4, label: "Pesce" },
+  { code: 5, label: "Arachidi" },
+  { code: 6, label: "Soia" },
+  { code: 7, label: "Latte" },
+  { code: 8, label: "Frutta a guscio" },
+  { code: 9, label: "Sedano" },
+  { code: 10, label: "Senape" },
+  { code: 11, label: "Sesamo" },
+  { code: 12, label: "Solfiti" },
+  { code: 13, label: "Lupini" },
+  { code: 14, label: "Molluschi" },
+] as const;
+
+export const allergenLabelByCode = new Map<number, string>(
+  ALLERGENS.map(a => [a.code, a.label])
+);
+
 
 export default function MenuDrinkPage() {
   const [drinks, setDrinks] = useState<Drink[] | null>(null);
@@ -106,6 +130,7 @@ export default function MenuDrinkPage() {
               description: String(x.description ?? ""),
               category: String(x.category ?? "altro"),
               price: (x.price ?? x.prezzo ?? null) as number | null,
+              allergens: Array.isArray(x.allergens) ? x.allergens : [],
               linkToNumericId: (x.linkToNumericId ?? null) as number | null,
               disponibile: x.disponibile !== false,
             };
@@ -167,7 +192,7 @@ export default function MenuDrinkPage() {
   }, [drinks]);
 
   // ordine gruppi fisso
-  const GROUP_ORDER = ["cocktail", "birre","vini" ,"soft drink", "altro" ] as const;
+  const GROUP_ORDER = ["cocktail", "birre", "vini", "soft drink", "altro"] as const;
 
   const orderedSections = useMemo(() => {
     const keys = Object.keys(groupedSorted);
@@ -203,7 +228,7 @@ export default function MenuDrinkPage() {
               />
               <p style={{ margin: 0 }}>{loadingMsg}</p>
               <p style={{ margin: 0, opacity: 0.75, fontSize: 12 }}>
-                Se è lento... non è uno sbajo.
+                S è lento... non è uno sbajo.
               </p>
             </div>
           </div>
@@ -228,7 +253,16 @@ export default function MenuDrinkPage() {
                       className={styles.item}
                     >
                       <div className={styles.details}>
-                        <h4 className={styles.nameItem}>{item.name}</h4>
+                        <h4 className={styles.nameItem}>
+                          {item.name}
+                          {item.allergens.length > 0 && (
+                            <span className={styles.codes}>
+                              {" ["}
+                              {item.allergens.join(", ")}
+                              {"]"}
+                            </span>
+                          )}
+                        </h4>
                         {!!item.description && <p>{item.description}</p>}
 
                         {piatto && (
@@ -257,8 +291,24 @@ export default function MenuDrinkPage() {
             </section>
           ))
         )}
-      </main>
+        <section className={styles.allergensLegend}>
+        <h3 className={styles.allergensTitle}>Allergeni</h3>
 
+        <ul className={styles.allergensList}>
+          {ALLERGENS.map((a) => (
+            <li key={a.code} className={styles.allergenItem}>
+              <span className={styles.allergenCode}>{a.code}</span>
+              <span className={styles.allergenText}>{a.label}</span>
+            </li>
+          ))}
+        </ul>
+
+        <p className={styles.allergensNote}>
+          Per informazioni su ingredienti e possibili contaminazioni crociate
+          rivolgiti al personale.
+        </p>
+      </section>
+      </main>
       <Footer />
 
       <style jsx global>{`

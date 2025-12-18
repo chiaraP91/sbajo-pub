@@ -150,10 +150,7 @@ export default function TableMenuPage() {
           <div className={s.card}>
             <div className={s.actions} style={{ marginTop: 0 }}>
               <button className={`${s.btn} ${s.btnPrimary}`} onClick={() => goCreate("food")}>
-                + Nuovo Food
-              </button>
-              <button className={`${s.btn} ${s.btnPrimary}`} onClick={() => goCreate("drink")}>
-                + Nuovo Drink
+                + Nuovo
               </button>
               <button className={`${s.btn} ${s.btnPrimary}`} onClick={() => goDisponibilita()}>
                 Disponibilità

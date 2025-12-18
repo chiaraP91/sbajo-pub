@@ -62,6 +62,27 @@ function labelCategory(cat: string) {
   return cat.charAt(0).toUpperCase() + cat.slice(1);
 }
 
+export const ALLERGENS = [
+  { code: 1, label: "Glutine" },
+  { code: 2, label: "Crostacei" },
+  { code: 3, label: "Uova" },
+  { code: 4, label: "Pesce" },
+  { code: 5, label: "Arachidi" },
+  { code: 6, label: "Soia" },
+  { code: 7, label: "Latte" },
+  { code: 8, label: "Frutta a guscio" },
+  { code: 9, label: "Sedano" },
+  { code: 10, label: "Senape" },
+  { code: 11, label: "Sesamo" },
+  { code: 12, label: "Solfiti" },
+  { code: 13, label: "Lupini" },
+  { code: 14, label: "Molluschi" },
+] as const;
+
+export const allergenLabelByCode = new Map<number, string>(
+  ALLERGENS.map(a => [a.code, a.label])
+);
+
 export default function MenuFoodPage() {
   const [menu, setMenu] = useState<Food[] | null>(null);
   const [drinks, setDrinks] = useState<DrinkMin[] | null>(null);
@@ -200,7 +221,7 @@ export default function MenuFoodPage() {
               />
               <p style={{ margin: 0 }}>{loadingMsg}</p>
               <p style={{ margin: 0, opacity: 0.75, fontSize: 12 }}>
-                Se è lento... non è uno sbajo.
+                S è lento... non è uno sbajo.
               </p>
             </div>
           </div>
@@ -282,8 +303,25 @@ export default function MenuFoodPage() {
             </section>
           ))
         )}
-      </main>
+         <section className={styles.allergensLegend}>
+        <h3 className={styles.allergensTitle}>Allergeni</h3>
 
+        <ul className={styles.allergensList}>
+          {ALLERGENS.map((a) => (
+            <li key={a.code} className={styles.allergenItem}>
+              <span className={styles.allergenCode}>{a.code}</span>
+              <span className={styles.allergenText}>{a.label}</span>
+            </li>
+          ))}
+        </ul>
+
+        <p className={styles.allergensNote}>
+          Per informazioni su ingredienti e possibili contaminazioni crociate
+          rivolgiti al personale.
+        </p>
+      </section>
+
+      </main>
       <Footer />
 
       <style jsx global>{`
