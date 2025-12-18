@@ -4,9 +4,10 @@ import styles from "@/styles/menu.module.scss";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import HeroCarousel from "@/components/HeroCarousel";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "@/lib/firebase";
+import Link from "next/link";
 
 const foodImages = [
   "/assets/img/pasta.png",
@@ -23,13 +24,8 @@ type FoodDoc = {
   price?: number | null;
   prezzo?: number | null;
   allergens?: number[];
-  linkToNumericId?: number | null;
-  disponibile?: boolean;
-};
-
-type DrinkDoc = {
-  numericId?: number;
-  name?: string;
+  linkFoodId?: number | null;
+  linkDrinkId?: number | null;
   disponibile?: boolean;
 };
 
@@ -40,8 +36,16 @@ type Food = {
   category: string;
   price: number | null;
   allergens: number[];
-  linkToNumericId: number | null;
+  linkFoodId: number | null;
+  linkDrinkId: number | null;
   disponibile: boolean;
+};
+
+
+type DrinkDoc = {
+  numericId?: number;
+  name?: string;
+  disponibile?: boolean;
 };
 
 type DrinkMin = {
@@ -90,10 +94,9 @@ export default function MenuFoodPage() {
   const [loading, setLoading] = useState(true);
   const [loadingMsg, setLoadingMsg] = useState("Sto caricando il menu…");
   const [error, setError] = useState<string | null>(null);
-
+  const [hash, setHash] = useState<string>("");
   useEffect(() => {
     let alive = true;
-
     const load = async () => {
       setError(null);
       setLoading(true);
@@ -113,7 +116,7 @@ export default function MenuFoodPage() {
           .map((d) => {
             const x = d.data() as FoodDoc;
             const numericId = Number(x.numericId ?? d.id);
-
+            console.log("Loading menu-food from Firestore", x);
             return {
               numericId,
               name: String(x.name ?? ""),
@@ -121,7 +124,8 @@ export default function MenuFoodPage() {
               category: String(x.category ?? "altro"),
               price: (x.price ?? x.prezzo ?? null) as number | null,
               allergens: Array.isArray(x.allergens) ? x.allergens : [],
-              linkToNumericId: (x.linkToNumericId ?? null) as number | null,
+              linkFoodId: (x.linkFoodId ?? null) as number | null,
+              linkDrinkId: (x.linkDrinkId ?? null) as number | null,
               disponibile: x.disponibile !== false,
             };
           })
@@ -159,6 +163,51 @@ export default function MenuFoodPage() {
       alive = false;
     };
   }, []);
+
+
+ const scrollToHash = useCallback((h: string) => {
+  const scrollContainer = document.getElementById("menu-scroll");
+  if (!scrollContainer) return;
+
+  const id = h.startsWith("#") ? h.slice(1) : h;
+  if (!id) return;
+
+  let tries = 0;
+
+  const tick = () => {
+    const target = document.getElementById(id);
+    if (!target) {
+      if (++tries < 30) requestAnimationFrame(tick); // aspetta che esista
+      return;
+    }
+
+    // header sticky? metti l’altezza reale qui se ce l’hai
+    const HEADER_OFFSET = 72; // cambia se serve
+
+    const cTop = scrollContainer.getBoundingClientRect().top;
+    const tTop = target.getBoundingClientRect().top;
+
+    const nextTop =
+      scrollContainer.scrollTop + (tTop - cTop) - HEADER_OFFSET;
+
+    scrollContainer.scrollTo({ top: nextTop, behavior: "smooth" });
+
+    // se il layout cambia ancora (immagini/font), riprova un paio di volte
+    if (++tries < 6) requestAnimationFrame(tick);
+  };
+
+  requestAnimationFrame(tick);
+}, []);
+
+
+useEffect(() => {
+  if (loading) return;
+  const h = window.location.hash;
+  if (!h) return;
+  scrollToHash(h);
+}, [loading, menu, scrollToHash]);
+
+
 
   // map drink per numericId
   const drinkById = useMemo(() => {
@@ -204,7 +253,8 @@ export default function MenuFoodPage() {
 
       <Header />
 
-      <main className={styles.scrollArea}>
+      <main id="menu-scroll" className={styles.scrollArea}>
+
         {loading ? (
           <div className={styles.empty}>
             <div style={{ display: "grid", gap: 8, justifyItems: "center" }}>
@@ -237,10 +287,11 @@ export default function MenuFoodPage() {
               <ul className={styles.list}>
                 {items.map((item) => {
                   const linkedFood =
-                    item.linkToNumericId != null ? foodById.get(item.linkToNumericId) : undefined;
+                    item.linkFoodId != null ? foodById.get(item.linkFoodId) : undefined;
 
                   const linkedDrink =
-                    item.linkToNumericId != null ? drinkById.get(item.linkToNumericId) : undefined;
+                    item.linkDrinkId != null ? drinkById.get(item.linkDrinkId) : undefined;
+
 
                   return (
                     <li
@@ -265,10 +316,24 @@ export default function MenuFoodPage() {
                         {linkedFood && (
                           <div className={styles.pairing}>
                             <span className={styles.pairingLabel}>Provalo con:</span>
+
                             <a
-                              href={`/menu-food#food-${linkedFood.numericId}`}
+                              href={`#food-${linkedFood.numericId}`}
                               className={styles.pairingCard}
                               aria-label={`Vedi ${linkedFood.name} nel menu food`}
+                              onClick={(e) => {
+                                e.preventDefault();
+                                const newHash = `#food-${linkedFood.numericId}`;
+
+                                // aggiorna l'URL SENZA far scattare scroll della window
+                                history.pushState(null, "", newHash);
+
+                                // scrolla sempre (anche se stai cliccando lo stesso elemento)
+                                scrollToHash(newHash);
+
+                                // opzionale: mantiene anche lo stato hash React coerente
+                                setHash(newHash);
+                              }}
                             >
                               <span className={styles.pairingIcon}>🍴</span>
                               <span className={styles.pairingText}>{linkedFood.name}</span>
@@ -280,7 +345,7 @@ export default function MenuFoodPage() {
                         {linkedDrink && (
                           <div className={styles.pairing}>
                             <span className={styles.pairingLabel}>Consigliato con</span>
-                            <a
+                            <Link
                               href={`/menu-drink#drink-${linkedDrink.numericId}`}
                               className={styles.pairingCard}
                               aria-label={`Vedi ${linkedDrink.name} nel menu drink`}
@@ -288,7 +353,7 @@ export default function MenuFoodPage() {
                               <span className={styles.pairingIcon}>🍸</span>
                               <span className={styles.pairingText}>{linkedDrink.name}</span>
                               <span className={styles.pairingArrow}>›</span>
-                            </a>
+                            </Link>
                           </div>
                         )}
                       </div>
@@ -303,23 +368,23 @@ export default function MenuFoodPage() {
             </section>
           ))
         )}
-         <section className={styles.allergensLegend}>
-        <h3 className={styles.allergensTitle}>Allergeni</h3>
+        <section className={styles.allergensLegend}>
+          <h3 className={styles.allergensTitle}>Allergeni</h3>
 
-        <ul className={styles.allergensList}>
-          {ALLERGENS.map((a) => (
-            <li key={a.code} className={styles.allergenItem}>
-              <span className={styles.allergenCode}>{a.code}</span>
-              <span className={styles.allergenText}>{a.label}</span>
-            </li>
-          ))}
-        </ul>
+          <ul className={styles.allergensList}>
+            {ALLERGENS.map((a) => (
+              <li key={a.code} className={styles.allergenItem}>
+                <span className={styles.allergenCode}>{a.code}</span>
+                <span className={styles.allergenText}>{a.label}</span>
+              </li>
+            ))}
+          </ul>
 
-        <p className={styles.allergensNote}>
-          Per informazioni su ingredienti e possibili contaminazioni crociate
-          rivolgiti al personale.
-        </p>
-      </section>
+          <p className={styles.allergensNote}>
+            Per informazioni su ingredienti e possibili contaminazioni crociate
+            rivolgiti al personale.
+          </p>
+        </section>
 
       </main>
       <Footer />

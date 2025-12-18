@@ -4,9 +4,10 @@ import styles from "@/styles/menu.module.scss";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import HeroCarousel from "@/components/HeroCarousel";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "@/lib/firebase";
+import Link from "next/link";
 
 const drinkImages = [
   "/assets/img/drink1.png",
@@ -23,31 +24,43 @@ type DrinkDoc = {
   prezzo?: number | null;
   price?: number | null;
   allergens?: string[];
-  linkToNumericId?: number | null;
+  linkFoodId: number | null;
+  linkDrinkId: number | null;
   disponibile?: boolean;
 };
 
 type FoodDoc = {
   numericId?: number;
   name?: string;
+  description?: string;
+  category?: string;
+  price?: number | null;
+  prezzo?: number | null;
+  allergens?: number[];
+  linkFoodId?: number | null;
+  linkDrinkId?: number | null;
   disponibile?: boolean;
 };
 
-type Drink = {
+type Food = {
+  numericId: number;
+  name: string;
+};
+
+
+type DrinkMin = {
   numericId: number;
   name: string;
   description: string;
   category: string;
   price: number | null;
   allergens: string[];
-  linkToNumericId: number | null;
+  linkFoodId: number | null;
+  linkDrinkId: number | null;
   disponibile: boolean;
 };
 
-type FoodMin = {
-  numericId: number;
-  name: string;
-};
+
 
 function normalizeCategory(cat: string | undefined) {
   return (cat ?? "altro").toLowerCase().trim();
@@ -59,7 +72,7 @@ function labelCategory(cat: string) {
   return cat.charAt(0).toUpperCase() + cat.slice(1);
 }
 
-function priceSort(a: Drink, b: Drink) {
+function priceSort(a: DrinkMin, b: DrinkMin) {
   const ap = a.price;
   const bp = b.price;
 
@@ -95,13 +108,13 @@ export const allergenLabelByCode = new Map<number, string>(
 
 
 export default function MenuDrinkPage() {
-  const [drinks, setDrinks] = useState<Drink[] | null>(null);
-  const [food, setFood] = useState<FoodMin[] | null>(null);
+  const [drinks, setDrinks] = useState<DrinkMin[] | null>(null);
+  const [food, setFood] = useState<Food[] | null>(null);
 
   const [loading, setLoading] = useState(true);
   const [loadingMsg, setLoadingMsg] = useState("Sto caricando il menu drink…");
   const [error, setError] = useState<string | null>(null);
-
+const [hash, setHash] = useState<string>("");
   useEffect(() => {
     let alive = true;
 
@@ -120,7 +133,7 @@ export default function MenuDrinkPage() {
 
         if (!alive) return;
 
-        const drinksData: Drink[] = drinkSnap.docs
+        const drinksData: DrinkMin[] = drinkSnap.docs
           .map((d) => {
             const x = d.data() as DrinkDoc;
             const numericId = Number(x.numericId ?? d.id);
@@ -131,13 +144,14 @@ export default function MenuDrinkPage() {
               category: String(x.category ?? "altro"),
               price: (x.price ?? x.prezzo ?? null) as number | null,
               allergens: Array.isArray(x.allergens) ? x.allergens : [],
-              linkToNumericId: (x.linkToNumericId ?? null) as number | null,
+              linkFoodId: (x.linkFoodId ?? null) as number | null,
+              linkDrinkId: (x.linkDrinkId ?? null) as number | null,
               disponibile: x.disponibile !== false,
             };
           })
           .filter((x) => Number.isFinite(x.numericId) && x.name && x.disponibile);
 
-        const foodData: FoodMin[] = foodSnap.docs
+        const foodData: Food[] = foodSnap.docs
           .map((d) => {
             const x = d.data() as FoodDoc;
             const numericId = Number(x.numericId ?? d.id);
@@ -170,8 +184,63 @@ export default function MenuDrinkPage() {
     };
   }, []);
 
+  
+  useEffect(() => {
+    const onHash = () => setHash(window.location.hash || "");
+    onHash(); // inizializza
+    window.addEventListener("hashchange", onHash);
+    return () => window.removeEventListener("hashchange", onHash);
+  }, []);
+
+  const scrollToHash = useCallback((h: string) => {
+    const scrollContainer = document.getElementById("menu-scroll");
+    if (!scrollContainer) return;
+
+    const id = h.startsWith("#") ? h.slice(1) : h;
+    if (!id) return;
+
+    const target = document.getElementById(id);
+    if (!target) return;
+
+    requestAnimationFrame(() => {
+      const cRect = scrollContainer.getBoundingClientRect();
+      const tRect = target.getBoundingClientRect();
+      const top = (tRect.top - cRect.top) + scrollContainer.scrollTop - 12;
+      scrollContainer.scrollTo({ top, behavior: "smooth" });
+    });
+  }, []);
+
+  useEffect(() => {
+    if (loading) return;
+    if (!hash) return;
+    scrollToHash(hash);
+  }, [loading, drinks, hash, scrollToHash]);
+
+  useEffect(() => {
+    if (loading) return;
+
+    const scrollContainer = document.getElementById("menu-scroll");
+    if (!scrollContainer) return;
+
+    const hash = window.location.hash;
+    if (!hash) return;
+
+    const target = document.getElementById(hash.slice(1));
+    if (!target) return;
+
+    requestAnimationFrame(() => {
+      const cRect = scrollContainer.getBoundingClientRect();
+      const tRect = target.getBoundingClientRect();
+      const top = (tRect.top - cRect.top) + scrollContainer.scrollTop - 12;
+
+      scrollContainer.scrollTo({ top, behavior: "smooth" });
+    });
+  }, [loading, drinks]);
+
+
+
   const foodById = useMemo(() => {
-    const map = new Map<number, FoodMin>();
+    const map = new Map<number, Food>();
     (food ?? []).forEach((p) => map.set(p.numericId, p));
     return map;
   }, [food]);
@@ -182,7 +251,7 @@ export default function MenuDrinkPage() {
       const cat = normalizeCategory(item.category);
       (acc[cat] ??= []).push(item);
       return acc;
-    }, {} as Record<string, Drink[]>);
+    }, {} as Record<string, DrinkMin[]>);
 
     for (const k of Object.keys(grouped)) {
       grouped[k] = [...grouped[k]].sort(priceSort);
@@ -211,7 +280,8 @@ export default function MenuDrinkPage() {
       <div className={styles.scrim} aria-hidden="true" />
       <Header />
 
-      <main className={styles.scrollArea}>
+      <main id="menu-scroll" className={styles.scrollArea}>
+
         {loading ? (
           <div className={styles.empty}>
             <div style={{ display: "grid", gap: 8, justifyItems: "center" }}>
@@ -244,7 +314,7 @@ export default function MenuDrinkPage() {
               <ul className={styles.list}>
                 {items.map((item) => {
                   const piatto =
-                    item.linkToNumericId != null ? foodById.get(item.linkToNumericId) : undefined;
+                    item.linkFoodId != null ? foodById.get(item.linkFoodId) : undefined;
 
                   return (
                     <li
@@ -268,15 +338,16 @@ export default function MenuDrinkPage() {
                         {piatto && (
                           <div className={styles.pairing}>
                             <span className={styles.pairingLabel}>Provalo con:</span>
-                            <a
+                            <Link
                               href={`/menu-food#food-${piatto.numericId}`}
                               className={styles.pairingCard}
                               aria-label={`Vedi ${piatto.name} nel menu food`}
+                              scroll={false}  // importantissimo: non far scrollare la window
                             >
                               <span className={styles.pairingIcon}>🍴</span>
                               <span className={styles.pairingText}>{piatto.name}</span>
                               <span className={styles.pairingArrow}>›</span>
-                            </a>
+                            </Link>
                           </div>
                         )}
                       </div>
@@ -292,22 +363,22 @@ export default function MenuDrinkPage() {
           ))
         )}
         <section className={styles.allergensLegend}>
-        <h3 className={styles.allergensTitle}>Allergeni</h3>
+          <h3 className={styles.allergensTitle}>Allergeni</h3>
 
-        <ul className={styles.allergensList}>
-          {ALLERGENS.map((a) => (
-            <li key={a.code} className={styles.allergenItem}>
-              <span className={styles.allergenCode}>{a.code}</span>
-              <span className={styles.allergenText}>{a.label}</span>
-            </li>
-          ))}
-        </ul>
+          <ul className={styles.allergensList}>
+            {ALLERGENS.map((a) => (
+              <li key={a.code} className={styles.allergenItem}>
+                <span className={styles.allergenCode}>{a.code}</span>
+                <span className={styles.allergenText}>{a.label}</span>
+              </li>
+            ))}
+          </ul>
 
-        <p className={styles.allergensNote}>
-          Per informazioni su ingredienti e possibili contaminazioni crociate
-          rivolgiti al personale.
-        </p>
-      </section>
+          <p className={styles.allergensNote}>
+            Per informazioni su ingredienti e possibili contaminazioni crociate
+            rivolgiti al personale.
+          </p>
+        </section>
       </main>
       <Footer />
 
