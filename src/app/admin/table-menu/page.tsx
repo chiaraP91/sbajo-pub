@@ -149,8 +149,11 @@ export default function TableMenuPage() {
 
           <div className={s.card}>
             <div className={s.actions} style={{ marginTop: 0 }}>
+              <button className={`${s.btn} ${s.btnPrimary}`} onClick={() => goCreate("food")}>
+                + Nuovo Food
+              </button>
               <button className={`${s.btn} ${s.btnPrimary}`} onClick={() => goCreate("drink")}>
-                + Nuovo
+                + Nuovo Drink
               </button>
               <button className={`${s.btn} ${s.btnPrimary}`} onClick={() => goDisponibilita()}>
                 Disponibilità
@@ -164,61 +167,109 @@ export default function TableMenuPage() {
             ) : all.length === 0 ? (
               <p className={s.subtitle}>Nessun elemento.</p>
             ) : (
-              <div className={s.list}>
-                {all.map((row) => (
-                  <div key={`${row.menuType}-${row.numericId}`} className={s.item}>
-                    <div className={s.itemTop}>
-                      <div style={{ minWidth: 0 }}>
-                        <p className={s.itemTitle} style={{ marginBottom: 6 }}>
-                          #{row.numericId} · {row.name}{" "}
-                          <span style={{ opacity: 0.7 }}>
-                            ({row.menuType} · {row.category})
-                          </span>
-                        </p>
+              <>
+                {/* FOOD SECTION */}
+                <h2 className={s.title}>Food</h2>
+                {food.length > 0 ? (
+                  <div className={s.list}>
+                    {food.map((row) => (
+                      <div key={`${row.menuType}-${row.numericId}`} className={s.item}>
+                        <div className={s.itemTop}>
+                          <div style={{ minWidth: 0 }}>
+                            <p className={s.itemTitle} style={{ marginBottom: 6 }}>
+                              #{row.numericId} · {row.name}{" "}
+                              <span style={{ opacity: 0.7 }}>
+                                ({row.menuType} · {row.category})
+                              </span>
+                            </p>
+                            <div className={s.badgeRow}>
+                              {typeof row.price === "number" ? (
+                                <span className={s.badge}>€ {row.price}</span>
+                              ) : (
+                                <span className={`${s.badge} ${s.badgeMuted}`}>€ -</span>
+                              )}
 
-                        <div className={s.badgeRow}>
-                          {typeof row.price === "number" ? (
-                            <span className={s.badge}>€ {row.price}</span>
-                          ) : (
-                            <span className={`${s.badge} ${s.badgeMuted}`}>€ -</span>
-                          )}
-
-                          {typeof row.disponibile === "boolean" ? (
-                            <span className={`${s.badge} ${row.disponibile ? "" : s.badgeMuted}`}>
-                              {row.disponibile ? "Disponibile" : "Non disponibile"}
-                            </span>
-                          ) : (
-                            <span className={`${s.badge} ${s.badgeMuted}`}>Disponibilità: -</span>
-                          )}
-                        </div>
-
-                        {row.description && (
-                          <div className={s.descriptionRow}>
-                            {row.description}
+                              {typeof row.disponibile === "boolean" ? (
+                                <span
+                                  className={`${s.badge} ${row.disponibile ? "" : s.badgeMuted}`}
+                                >
+                                  {row.disponibile ? "Disponibile" : "Non disponibile"}
+                                </span>
+                              ) : (
+                                <span className={`${s.badge} ${s.badgeMuted}`}>Disponibilità: -</span>
+                              )}
+                            </div>
+                            {row.description && <div className={s.descriptionRow}>{row.description}</div>}
                           </div>
-                        )}
-
+                          <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
+                            <button className={s.btn} onClick={() => goEdit(row)}>
+                              Modifica
+                            </button>
+                            <button className={`${s.btn} ${s.btnDanger}`} onClick={() => onDelete(row)}>
+                              Elimina
+                            </button>
+                          </div>
+                        </div>
                       </div>
-
-                      <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
-                        <button className={s.btn} onClick={() => goEdit(row)}>
-                          Modifica
-                        </button>
-                        <button className={`${s.btn} ${s.btnDanger}`} onClick={() => onDelete(row)}>
-                          Elimina
-                        </button>
-                      </div>
-                    </div>
+                    ))}
                   </div>
-                ))}
-              </div>
+                ) : (
+                  <p className={s.subtitle}>Nessun elemento nella sezione Food.</p>
+                )}
+
+                <hr className={s.hr} />
+
+                {/* DRINK SECTION */}
+                <h2 className={s.title}>Drink</h2>
+                {drink.length > 0 ? (
+                  <div className={s.list}>
+                    {drink.map((row) => (
+                      <div key={`${row.menuType}-${row.numericId}`} className={s.item}>
+                        <div className={s.itemTop}>
+                          <div style={{ minWidth: 0 }}>
+                            <p className={s.itemTitle} style={{ marginBottom: 6 }}>
+                              #{row.numericId} · {row.name}{" "}
+                              <span style={{ opacity: 0.7 }}>
+                                ({row.menuType} · {row.category})
+                              </span>
+                            </p>
+                            <div className={s.badgeRow}>
+                              {typeof row.price === "number" ? (
+                                <span className={s.badge}>€ {row.price}</span>
+                              ) : (
+                                <span className={`${s.badge} ${s.badgeMuted}`}>€ -</span>
+                              )}
+
+                              {typeof row.disponibile === "boolean" ? (
+                                <span
+                                  className={`${s.badge} ${row.disponibile ? "" : s.badgeMuted}`}
+                                >
+                                  {row.disponibile ? "Disponibile" : "Non disponibile"}
+                                </span>
+                              ) : (
+                                <span className={`${s.badge} ${s.badgeMuted}`}>Disponibilità: -</span>
+                              )}
+                            </div>
+                            {row.description && <div className={s.descriptionRow}>{row.description}</div>}
+                          </div>
+                          <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
+                            <button className={s.btn} onClick={() => goEdit(row)}>
+                              Modifica
+                            </button>
+                            <button className={`${s.btn} ${s.btnDanger}`} onClick={() => onDelete(row)}>
+                              Elimina
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className={s.subtitle}>Nessun elemento nella sezione Drink.</p>
+                )}
+              </>
             )}
           </div>
-
-          <p className={s.subtitle} style={{ marginTop: 14 }}>
-            Percorsi: <strong>/admin/table-menu</strong> (lista) ·{" "}
-            <strong>/admin/menu-editor</strong> (editor)
-          </p>
         </div>
       </div>
     </AdminGate>
