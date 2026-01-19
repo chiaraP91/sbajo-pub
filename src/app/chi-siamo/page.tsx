@@ -47,7 +47,7 @@ export default function ChiSiamoPage() {
             <h1 className={styles.title}>Silvio</h1>
             <p className={styles.text}>
               Sbajo nasce da un’intuizione semplice ma potente: trasformare l’imprevisto, l’insolito, ciò che “non dovrebbe funzionare”, in quell’elemento che rende la serata indimenticabile. È il luogo dove i cocktail hanno personalità, la cucina osa, gli eventi sorprendono e l’atmosfera ti invita sempre a fermarti per “un ultimo giro”.
-Vogliamo creare uno spazio in cui chiunque possa sentirsi libero, accolto e a proprio agio, come a casa… ma con un tocco di magia in più.
+Vogliamo creare uno spazio in cui chiunque possa sentirsi libero accolto e a proprio agio, anche quando ci Si sente uno Sbajo!
             </p>
 
             <a className={styles.mapBtn} href={MAPS_URL} target="_blank" rel="noreferrer">
