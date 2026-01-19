@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import AdminGate from "@/components/AdminGate";
@@ -12,6 +13,7 @@ import {
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import s from "@/styles/adminMenuEditor.module.scss";
+import Link from "next/link";
 
 type MenuType = "food" | "drink";
 
@@ -150,6 +152,12 @@ export default function AvailabilityPage() {
             <div className={s.page}>
                 <div className={s.container}>
                     <h1 className={s.title}>Disponibilità menu</h1>
+                    <div className={s.actions}>
+                        <Link href="/admin/eventi/nuovo" className={s.addButton}>
+                            + Aggiungi evento
+                        </Link>
+                    </div>
+
 
                     {err && <div className={`${s.notice} ${s.noticeErr}`}>{err}</div>}
                     {msg && <div className={`${s.notice} ${s.noticeOk}`}>{msg}</div>}

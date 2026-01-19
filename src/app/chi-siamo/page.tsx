@@ -1,66 +1,71 @@
+import type { Metadata } from "next";
+import Image from "next/image";
+
 import styles from "@/styles/chi-siamo.module.scss";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import HeroCarousel from "@/components/HeroCarousel";
 
+export const metadata: Metadata = {
+  title: "Chi siamo | Sbajo Cocktail Bar",
+  description:
+    "La storia di Sbajo: cocktail con carattere, cucina creativa ed eventi. Scopri l’atmosfera e chi c’è dietro.",
+  alternates: { canonical: "https://sbajococktailbar.it/chi-siamo" },
+};
+
 const aboutImages = [
-    "/assets/img/about1.jpg",
-    "/assets/img/about2.jpg",
-    "/assets/img/about3.jpg",
-    "/assets/img/about4.jpg",
+  "/assets/img/about1.jpg",
+  "/assets/img/about2.jpg",
+  "/assets/img/about3.jpg",
+  "/assets/img/about4.jpg",
 ];
 
-// Metti qui il link “Maps” che usi nel footer (stesso identico)
-const MAPS_URL =
-    "https://maps.apple.com/?q=Sbajo"; // <-- sostituisci con indirizzo/coordinate reali
+const MAPS_URL = "https://maps.apple.com/?q=Sbajo"; // metti indirizzo vero
 
 export default function ChiSiamoPage() {
-    return (
-        <div className={styles.wrapper}>
-            <HeroCarousel images={aboutImages} />
-            <div className={styles.scrim} aria-hidden="true" />
+  return (
+    <div className={styles.wrapper}>
+      <HeroCarousel images={aboutImages} />
+      <div className={styles.scrim} aria-hidden="true" />
 
-            <Header />
+      <Header />
 
-            <main className={styles.scrollArea}>
+      <main className={styles.scrollArea}>
+        <section className={styles.card}>
+          <div className={styles.media}>
+            <Image
+              src="/assets/img/sbajo-50.jpg"
+              alt="Silvio"
+              className={styles.photo}
+              width={720}
+              height={900}
+              priority
+            />
+          </div>
 
-                <section className={styles.card}>
-                    <div className={styles.media}>
-                        {/* Metti la foto di Silvio qui */}
-                        <img
-                            src="/assets/img/silvio.jpg"
-                            alt="Silvio"
-                            className={styles.photo}
-                        />
-                    </div>
+          <div className={styles.content}>
+            <h1 className={styles.title}>Silvio</h1>
+            <p className={styles.text}>
+              Sbajo nasce da un’intuizione semplice ma potente: trasformare l’imprevisto, l’insolito, ciò che “non dovrebbe funzionare”, in quell’elemento che rende la serata indimenticabile. È il luogo dove i cocktail hanno personalità, la cucina osa, gli eventi sorprendono e l’atmosfera ti invita sempre a fermarti per “un ultimo giro”.
+Vogliamo creare uno spazio in cui chiunque possa sentirsi libero, accolto e a proprio agio, come a casa… ma con un tocco di magia in più.
+            </p>
 
-                    <div className={styles.content}>
-                        <h2 className={styles.title}>Silvio</h2>
-                        <p className={styles.text}>
-                            Sbajo nasce da un’idea semplice: prendere ciò che “non dovrebbe funzionare”
-                            e farlo diventare la cosa più giusta della serata. Cocktail con carattere,
-                            cucina creativa, eventi, e quell’atmosfera che ti fa restare “solo un altro giro”.
-                        </p>
+            <a className={styles.mapBtn} href={MAPS_URL} target="_blank" rel="noreferrer">
+              Dove siamo
+            </a>
+          </div>
+        </section>
 
-                    </div>
-                </section>
-                <section className={styles.hero}>
-                     <p className={styles.sub}>
-                        Chi siamo? Se non lo sai è un grande sbajo!
-                    </p>
+        <section className={styles.hero}>
+          <p className={styles.sub}>Chi siamo? Se non lo sai è un grande sbajo!</p>
+          <p className={styles.discover}>Scoprilo qui</p>
+          <span className={styles.arrowDown} aria-hidden="true">
+            ↓
+          </span>
+        </section>
+      </main>
 
-                    <p className={styles.discover}>
-                        Scoprilo qui
-                    </p>
-
-                    <span className={styles.arrowDown} aria-hidden="true">↓</span>
-
-                </section>
-
-
-            </main>
-
-            <Footer />
-        </div>
-    );
+      <Footer />
+    </div>
+  );
 }

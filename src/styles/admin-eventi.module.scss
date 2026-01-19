@@ -1,0 +1,136 @@
+.page {
+  min-height: 100vh;
+  padding: 96px 16px 32px;
+  display: grid;
+  place-items: start center;
+  color: rgba(255,255,255,.9);
+}
+
+.header {
+  width: min(720px, 100%);
+  margin-bottom: 18px;
+}
+
+.title {
+  font-size: 34px;
+  margin: 0 0 8px;
+  letter-spacing: .2px;
+}
+
+.sub {
+  margin: 0;
+  opacity: .75;
+}
+
+.form {
+  width: min(720px, 100%);
+  background: rgba(255,255,255,.06);
+  border: 1px solid rgba(221,187,121,.18);
+  border-radius: 18px;
+  padding: 18px;
+  display: grid;
+  gap: 14px;
+  box-shadow: 0 18px 60px rgba(0,0,0,.35);
+  backdrop-filter: blur(8px);
+}
+
+.field {
+  display: grid;
+  gap: 8px;
+}
+
+.label {
+  font-weight: 600;
+  font-size: 13px;
+  opacity: .9;
+}
+
+.input, .textarea {
+  width: 100%;
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,.14);
+  background: rgba(0,0,0,.25);
+  color: rgba(255,255,255,.92);
+  padding: 12px 14px;
+  outline: none;
+}
+
+.textarea {
+  resize: vertical;
+  min-height: 120px;
+}
+
+.hint {
+  font-size: 12px;
+  opacity: .65;
+}
+
+.row {
+  display: grid;
+  gap: 14px;
+
+  @media (min-width: 740px) {
+    grid-template-columns: 1fr 1fr;
+    align-items: start;
+  }
+}
+
+.switchRow {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+
+  input {
+    width: 18px;
+    height: 18px;
+    accent-color: #ddbB79;
+  }
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 6px;
+}
+
+.primaryBtn, .secondaryBtn {
+  border-radius: 999px;
+  padding: 10px 16px;
+  font-weight: 700;
+  cursor: pointer;
+  border: 1px solid rgba(221,187,121,.25);
+}
+
+.primaryBtn {
+  background: linear-gradient(135deg, #ddbB79, #b89a5b);
+  color: #0b0c0f;
+}
+
+.secondaryBtn {
+  background: transparent;
+  color: rgba(255,255,255,.88);
+}
+
+.primaryBtn:disabled,
+.secondaryBtn:disabled {
+  opacity: .55;
+  cursor: not-allowed;
+}
+
+.alertError, .alertOk {
+  border-radius: 14px;
+  padding: 10px 12px;
+  font-weight: 600;
+  font-size: 13px;
+}
+
+.alertError {
+  background: rgba(255, 80, 80, .12);
+  border: 1px solid rgba(255, 80, 80, .22);
+}
+
+.alertOk {
+  background: rgba(80, 255, 160, .10);
+  border: 1px solid rgba(80, 255, 160, .22);
+}

@@ -8,7 +8,7 @@
     "allergens": [],
     "price": null,
     "linkToNumericId": null,
-    "disponibile": true
+    "disponibile": false
   },
   {
     "numericId": 9,
@@ -19,7 +19,7 @@
     "allergens": [],
     "price": null,
     "linkToNumericId": null,
-    "disponibile": true
+    "disponibile": false
   },
   {
     "numericId": 7,
@@ -30,7 +30,7 @@
     "allergens": [],
     "price": null,
     "linkToNumericId": null,
-    "disponibile": true
+    "disponibile": false
   },
   {
     "numericId": 24,
@@ -41,7 +41,7 @@
     "allergens": [],
     "price": null,
     "linkToNumericId": null,
-    "disponibile": true
+    "disponibile": false
   },
   {
     "numericId": 32,
@@ -52,7 +52,7 @@
     "allergens": [],
     "price": null,
     "linkToNumericId": null,
-    "disponibile": true
+    "disponibile": false
   },
   {
     "numericId": 13,
@@ -63,7 +63,7 @@
     "allergens": [],
     "price": null,
     "linkToNumericId": null,
-    "disponibile": true
+    "disponibile": false
   },
   {
     "numericId": 11,
@@ -74,7 +74,7 @@
     "allergens": [],
     "price": null,
     "linkToNumericId": null,
-    "disponibile": true
+    "disponibile": false
   },
   {
     "numericId": 5,
@@ -85,7 +85,7 @@
     "allergens": [],
     "price": null,
     "linkToNumericId": null,
-    "disponibile": true
+    "disponibile": false
   },
   {
     "numericId": 3,
@@ -96,7 +96,7 @@
     "allergens": [],
     "price": null,
     "linkToNumericId": null,
-    "disponibile": true
+    "disponibile": false
   },
   {
     "numericId": 1,
@@ -106,6 +106,39 @@
     "category": "soft drink",
     "allergens": [],
     "price": null,
+    "linkToNumericId": null,
+    "disponibile": false
+  },
+  {
+    "numericId": 18,
+    "menuType": "drink",
+    "name": "Fizz",
+    "description": "",
+    "category": "Cocktail",
+    "allergens": [],
+    "price": 8.00,
+    "linkToNumericId": null,
+    "disponibile": true
+  },
+  {
+    "numericId": 19,
+    "menuType": "drink",
+    "name": "Mixology drink",
+    "description": "",
+    "category": "Cocktail",
+    "allergens": [],
+    "price": 10.00,
+    "linkToNumericId": null,
+    "disponibile": true
+  },
+   {
+    "numericId": 22,
+    "menuType": "drink",
+    "name": "Premium drinks",
+    "description": "",
+    "category": "Cocktail",
+    "allergens": [],
+    "price": 12.00,
     "linkToNumericId": null,
     "disponibile": true
   }

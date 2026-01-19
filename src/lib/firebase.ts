@@ -14,4 +14,6 @@ const firebaseConfig = {
 const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
 
 export const db = getFirestore(app);
-export const auth = getAuth(app);
+
+// evita rogne in alcuni contesti SSR
+export const auth = typeof window === "undefined" ? undefined : getAuth(app);

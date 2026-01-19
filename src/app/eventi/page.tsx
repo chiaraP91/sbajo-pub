@@ -1,80 +1,102 @@
-import React from "react";
-import styles from '@/styles/eventi.module.scss';
+import type { Metadata } from "next";
+import { headers } from "next/headers";
+import Image from "next/image";
+import Link from "next/link";
+
+import styles from "@/styles/eventi.module.scss";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 
+export const metadata: Metadata = {
+  title: "Eventi | Sbajo Cocktail Bar",
+  description: "Eventi sbajati, serate speciali e appuntamenti da Sbajo.",
+  alternates: { canonical: "https://sbajococktailbar.it/eventi" },
+};
+
 export type EventItem = {
-  id: string | number;
-  day: string;      // "10"
-  month: string;    // "MAGGIO"
+  id: string;
+  day: string;
+  month: string;
   title: string;
   description: string;
-  imageUrl: string;
+  image: string;
   cta?: string;
   href?: string;
 };
 
-type EventsSectionProps = {
-  events?: EventItem[];
-};
+async function getEvents(): Promise<EventItem[]> {
+  const h = await headers();
+  const host = h.get("host");
+  const proto = process.env.NODE_ENV === "development" ? "http" : "https";
 
-const DEFAULT_EVENTS: EventItem[] = [
-  {
-    id: 1,
-    day: "20",
-    month: "DICEMBRE",
-    title: "Inaugurazione",
-    description: "Una evento per gli appassionati delle serate sbajate.",
-    imageUrl: "/assets/img/locandina1.jpeg",
-    cta: "Prenota il tuo posto",
-    href: "/prenota"
-  },
-];
+  const url = `${proto}://${host}/api/eventi`;
 
-const EventiPage: React.FC<EventsSectionProps> = ({ events }) => {
-  const items = events ?? DEFAULT_EVENTS;
+  const res = await fetch(url, { next: { revalidate: 3600 } });
+  if (!res.ok) return [];
+
+  const ct = res.headers.get("content-type") || "";
+  if (!ct.includes("application/json")) return [];
+
+  return res.json();
+}
+
+export default async function EventiPage() {
+  const items = await getEvents();
 
   return (
     <section className={styles.events}>
       <Header />
+
       <div className={styles.eventsHeader}>
-        <h2 className={styles.eventsTitle}>Eventi Sbajati</h2>
+        <h1 className={styles.eventsTitle}>Eventi Sbajati</h1>
       </div>
 
       <div className={styles.eventsList}>
-        {items.map((e) => (
-          <article key={e.id} className={styles.eventCard}>
-            <div className={styles.eventBorder} />
+        {items.length === 0 ? (
+          <p className={styles.empty}>Nessun evento disponibile al momento.</p>
+        ) : (
+          items.map((e) => (
+            <article key={e.id} className={styles.eventCard}>
+              <div className={styles.eventBorder} />
 
-            <div className={styles.eventDate}>
-              <span className={styles.eventDay}>{e.day}</span>
-              <span className={styles.eventMonth}>{e.month}</span>
-            </div>
+              <div className={styles.eventDate}>
+                <span className={styles.eventDay}>{e.day}</span>
+                <span className={styles.eventMonth}>{e.month}</span>
+              </div>
 
-            <div className={styles.eventImageWrapper}>
-              <img
-                src={e.imageUrl}
-                className={styles.eventImage}
-                alt={e.title}
-              />
-            </div>
+              <div className={styles.eventImageWrapper}>
+                <Image
+                  src={`/assets/img/${e.image}`}
+                  className={styles.eventImage}
+                  alt={e.title}
+                  width={1200}
+                  height={1600}
+                  sizes="(max-width: 768px) 90vw, 520px"
+                />
+              </div>
 
-            <div className={styles.eventContent}>
-              <h3 className={styles.eventTitle}>{e.title}</h3>
-              <p className={styles.eventDescription}>{e.description}</p>
+              <div className={styles.eventContent}>
+                <h2 className={styles.eventTitle}>{e.title}</h2>
+                <p className={styles.eventDescription}>{e.description}</p>
 
-              {e.cta && (
-                <a className={styles.eventButton} href={e.href ?? "#"}>
-                  {e.cta}
-                </a>
-              )}
-            </div>
-          </article>
-        ))}
+                {e.cta && (
+                  e.href ? (
+                    <Link className={styles.eventButton} href={e.href}>
+                      {e.cta}
+                    </Link>
+                  ) : (
+                    <span className={styles.eventButton} aria-disabled="true">
+                      {e.cta}
+                    </span>
+                  )
+                )}
+              </div>
+            </article>
+          ))
+        )}
       </div>
+
       <Footer />
     </section>
   );
-};
-
-export default EventiPage;
+}

@@ -93,7 +93,7 @@
 .photo {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
   filter: saturate(.95) contrast(.95) brightness(.92);
 }
 

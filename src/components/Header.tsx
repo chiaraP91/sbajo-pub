@@ -5,7 +5,7 @@ export default function Header() {
   return (
     <header className={styles.header}>
       <Link href="/" className={styles.logo}>
-        <img src="/assets/img/logo2.png" alt="Logo" className={styles.logoImage} />
+        <img src="/assets/img/logo3.png" alt="Logo" className={styles.logoImage} />
       </Link>
       <nav className={styles.nav}>
         <Link href="/menu-food" className={styles.icon} title="Menu food"><img src="/assets/img/ICON.png" alt="Menu food icon" className={styles.iconImage} /></Link>

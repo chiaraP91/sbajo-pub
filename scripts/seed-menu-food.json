@@ -1,5 +1,5 @@
 [
-  {
+    {
     "numericId": 18,
     "menuType": "food",
     "name": "Barbie Samosa",
@@ -108,5 +108,139 @@
     "price": null,
     "linkToNumericId": null,
     "published": true
+  },
+  {
+    "numericId": 1,
+    "menuType": "food",
+    "category": "Appetizer",
+    "name": "Patate Dippers",
+    "description": "Patate dippers fritte.",
+    "price": null,
+    "disponibile": true,
+    "published": true,
+    "linkDrinkId": null,
+    "linkFoodId": null,
+    "allergens": [1, 5, 6]
+  },
+  {
+    "numericId": 2,
+    "menuType": "food",
+    "category": "Appetizer",
+    "name": "Onion Rings",
+    "description": "Anelli di cipolla panati e fritti.",
+    "price": null,
+    "disponibile": true,
+    "published": true,
+    "linkDrinkId": null,
+    "linkFoodId": null,
+    "allergens": [1, 4, 5, 6]
+  },
+  {
+    "numericId": 3,
+    "menuType": "food",
+    "category": "Appetizer",
+    "name": "Polpette di Manzo",
+    "description": "Polpette di manzo panate (panko) aromatizzate con aglio e prezzemolo.",
+    "price": null,
+    "disponibile": true,
+    "published": true,
+    "linkDrinkId": null,
+    "linkFoodId": null,
+    "allergens": [1, 4, 5, 6, 7]
+  },
+  {
+    "numericId": 14,
+    "menuType": "food",
+    "category": "Appetizer",
+    "name": "Polletti",
+    "description": "Petto di pollo a filetti panati e fritti.",
+    "price": null,
+    "disponibile": true,
+    "published": true,
+    "linkDrinkId": null,
+    "linkFoodId": null,
+    "allergens": [1, 4, 5, 6]
+  },
+  {
+    "numericId": 5,
+    "menuType": "food",
+    "category": "Appetizer",
+    "name": "Sofficini",
+    "description": "Sofficini fritti: prosciutto e mozzarella oppure pomodoro e mozzarella.",
+    "price": null,
+    "disponibile": true,
+    "published": true,
+    "linkDrinkId": null,
+    "linkFoodId": null,
+    "allergens": [1, 4, 5, 6, 7]
+  },
+
+  {
+    "numericId": 6,
+    "menuType": "food",
+    "category": "Burger",
+    "name": "Smash",
+    "description": "Pane, hamburger smashato, lattuga, cetriolini, cipolla caramellata, cheddar, salsa burger.",
+    "price": null,
+    "disponibile": true,
+    "published": true,
+    "linkDrinkId": null,
+    "linkFoodId": null,
+    "allergens": [2, 3, 4, 5, 6, 7]
+  },
+  {
+    "numericId": 7,
+    "menuType": "food",
+    "category": "Burger",
+    "name": "Smash Bacon",
+    "description": "Pane, smash burger, lattuga, cetriolino, cheddar, bacon, salsa mayo e BBQ.",
+    "price": null,
+    "disponibile": true,
+    "published": true,
+    "linkDrinkId": null,
+    "linkFoodId": null,
+    "allergens": [2, 3, 4, 5, 6, 7]
+  },
+  {
+    "numericId": 8,
+    "menuType": "food",
+    "category": "Burger",
+    "name": "Vegan Burger",
+    "description": "Bun alla barbabietola, hamburger Beyond Meat, insalata, cetriolini, vegan mayo, vegan BBQ.",
+    "price": null,
+    "disponibile": true,
+    "published": true,
+    "linkDrinkId": null,
+    "linkFoodId": null,
+    "allergens": [2, 3, 4, 5, 6]
+  },
+  {
+    "numericId": 9,
+    "menuType": "food",
+    "category": "Burger",
+    "name": "Special",
+    "description": "Bun al carbone, filetto di pollo panato e fritto, cetriolino, insalata di cavolo rosso, salsa tartare.",
+    "price": null,
+    "disponibile": true,
+    "published": true,
+    "linkDrinkId": null,
+    "linkFoodId": null,
+    "allergens": [1, 2, 3, 4, 5, 6]
+  },
+
+  {
+    "numericId": 10,
+    "menuType": "food",
+    "category": "Dolci",
+    "name": "Cheesecake",
+    "description": "Cheesecake (cioccolato oppure caramello salato).",
+    "price": null,
+    "disponibile": true,
+    "published": true,
+    "linkDrinkId": null,
+    "linkFoodId": null,
+    "allergens": [5, 7]
   }
 ]
+
+

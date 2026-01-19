@@ -247,3 +247,23 @@ $ok: rgba(130, 255, 170, 0.9);
   line-height: 1.4;
   opacity: 0.9;
 }
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 24px;
+}
+
+.addButton {
+  padding: 10px 18px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #d6b77c, #b89a5b);
+  color: #0b0c0f;
+  font-weight: 600;
+  text-decoration: none;
+  transition: transform .15s ease, box-shadow .15s ease;
+
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 18px rgba(214,183,124,.35);
+  }
+}
