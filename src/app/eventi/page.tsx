@@ -8,9 +8,18 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 
 export const metadata: Metadata = {
-  title: "Eventi | Sbajo Cocktail Bar",
-  description: "Eventi sbajati, serate speciali e appuntamenti da Sbajo.",
+  title: "Eventi | Sbajo Cocktail Bar - Serate Speciali e Appuntamenti",
+  description:
+    "Eventi sbajati, serate speciali, live music e appuntamenti imperdibili. Scopri gli eventi di Sbajo Cocktail Bar ad Aprilia.",
+  keywords: "eventi Aprilia, serate Aprilia, live music, aperitivo, festa",
   alternates: { canonical: "https://sbajococktailbar.it/eventi" },
+  openGraph: {
+    title: "Eventi | Sbajo Cocktail Bar",
+    description: "Serate speciali e appuntamenti sbajati. Gli eventi di Sbajo.",
+    url: "https://sbajococktailbar.it/eventi",
+    type: "website",
+    locale: "it_IT",
+  },
 };
 
 export type EventItem = {
@@ -79,8 +88,8 @@ export default async function EventiPage() {
                 <h2 className={styles.eventTitle}>{e.title}</h2>
                 <p className={styles.eventDescription}>{e.description}</p>
 
-                {e.cta && (
-                  e.href ? (
+                {e.cta &&
+                  (e.href ? (
                     <Link className={styles.eventButton} href={e.href}>
                       {e.cta}
                     </Link>
@@ -88,8 +97,7 @@ export default async function EventiPage() {
                     <span className={styles.eventButton} aria-disabled="true">
                       {e.cta}
                     </span>
-                  )
-                )}
+                  ))}
               </div>
             </article>
           ))

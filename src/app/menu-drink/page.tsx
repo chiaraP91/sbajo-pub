@@ -20,9 +20,20 @@ const drinkImages = [
 ];
 
 export const metadata: Metadata = {
-  title: "Menu Drink | Sbajo Cocktail Bar",
-  description: "Cocktail, birre, vini e soft drink. Scopri il menu drink di Sbajo.",
- alternates: { canonical: "https://sbajococktailbar.it/menu-drink" },
+  title: "Menu Drink | Sbajo Cocktail Bar - Cocktail, Birre, Vini",
+  description:
+    "Menu drink esclusivo di Sbajo: cocktail signature, birre artigianali, vini selezionati e soft drink. Scopri le nostre creazioni uniche.",
+  keywords:
+    "cocktail Aprilia, birre Aprilia, vini, aperitivo, drink, menu cocktail",
+  alternates: { canonical: "https://sbajococktailbar.it/menu-drink" },
+  openGraph: {
+    title: "Menu Drink | Sbajo Cocktail Bar",
+    description:
+      "Cocktail signature, birre e vini selezionati. Il nostro menu drink esclusivo.",
+    url: "https://sbajococktailbar.it/menu-drink",
+    type: "website",
+    locale: "it_IT",
+  },
 };
 
 type FoodMin = { numericId: number; name: string };
@@ -39,11 +50,13 @@ type DrinkMin = {
   disponibile: boolean;
 };
 
-async function getMenuDrinkPageData(): Promise<{ drinks: DrinkMin[]; food: FoodMin[] }> {
+async function getMenuDrinkPageData(): Promise<{
+  drinks: DrinkMin[];
+  food: FoodMin[];
+}> {
   const h = await headers();
   const host = h.get("host");
-  const proto =
-    process.env.NODE_ENV === "development" ? "http" : "https";
+  const proto = process.env.NODE_ENV === "development" ? "http" : "https";
 
   const url = `${proto}://${host}/api/menu-drink-page`;
 
@@ -60,7 +73,6 @@ async function getMenuDrinkPageData(): Promise<{ drinks: DrinkMin[]; food: FoodM
 
   return res.json();
 }
-
 
 export default async function MenuDrinkPage() {
   const { drinks, food } = await getMenuDrinkPageData();

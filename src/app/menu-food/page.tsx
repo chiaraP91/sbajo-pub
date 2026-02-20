@@ -14,9 +14,19 @@ const foodImages = [
 ];
 
 export const metadata: Metadata = {
-  title: "Menu Food | Sbajo Cocktail Bar",
-  description: "Cucina creativa, burger, dolci e appetizer. Scopri il menu food di Sbajo.",
+  title: "Menu Food | Sbajo Cocktail Bar - Cucina Creativa, Burger, Dolci",
+  description:
+    "Menu food di Sbajo: piatti creativi, burger gourmet, dolci homemade e appetizer sfiziosissimi. Scopri la cucina creativa adAprilia.",
+  keywords: "cucina creativa Aprilia, burger Aprilia, dolci, cena, menu, food",
   alternates: { canonical: "https://sbajococktailbar.it/menu-food" },
+  openGraph: {
+    title: "Menu Food | Sbajo Cocktail Bar",
+    description:
+      "Cucina creativa e piatti gourmet. Scopri il nostro menu food esclusivo.",
+    url: "https://sbajococktailbar.it/menu-food",
+    type: "website",
+    locale: "it_IT",
+  },
 };
 
 type Food = {
@@ -33,7 +43,10 @@ type Food = {
 
 type DrinkMin = { numericId: number; name: string };
 
-async function getMenuFoodPageData(): Promise<{ menu: Food[]; drinks: DrinkMin[] }> {
+async function getMenuFoodPageData(): Promise<{
+  menu: Food[];
+  drinks: DrinkMin[];
+}> {
   const h = await headers();
   const host = h.get("host");
   const proto = process.env.NODE_ENV === "development" ? "http" : "https";
@@ -53,7 +66,6 @@ async function getMenuFoodPageData(): Promise<{ menu: Food[]; drinks: DrinkMin[]
 
   return res.json();
 }
-
 
 export default async function MenuFoodPage() {
   const { menu, drinks } = await getMenuFoodPageData();
