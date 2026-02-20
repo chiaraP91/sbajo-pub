@@ -15,7 +15,8 @@ export default function AdminGate({ children }: { children: React.ReactNode }) {
     const unsub = onAuthStateChanged(auth, (user) => {
       if (!user) {
         // evita loop se sei già sulla login
-        if (!path.includes("/admin/login")) router.replace("/admin/login");
+        if (!path.includes("/admin/login-page"))
+          router.replace("/admin/login-page");
         setOk(false);
       } else {
         setOk(true);

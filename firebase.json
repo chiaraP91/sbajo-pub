@@ -7,14 +7,27 @@
     "rules": "storage.rules"
   },
   "hosting": {
-    "public": "out",
+    "public": "public",
     "ignore": [
       "firebase.json",
       "**/.*",
-      "**/node_modules/**"
+      "**/node_modules/**",
+      "**/.next/**",
+      "**/dist/**",
+      "Dockerfile",
+      ".dockerignore",
+      "functions/**",
+      "**/*.md"
     ],
-    "rewrites": [{ "source": "**", "destination": "/index.html" }],
-    "cleanUrls": true,
-    "trailingSlash": false
+    "rewrites": [
+      {
+        "source": "**",
+        "run": {
+          "serviceId": "sbajo-nextjs",
+          "region": "us-central1"
+        }
+      }
+    ],
+    "cleanUrls": true
   }
 }
