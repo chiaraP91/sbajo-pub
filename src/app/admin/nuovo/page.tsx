@@ -4,15 +4,15 @@
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import styles from "@/styles/admin-eventi.module.scss";
-import Image from "next/image";
 
 import { auth } from "@/lib/firebase";
+import ImageUploader from "@/components/ImageUploader";
 
 type FormState = {
   title: string;
   description: string;
-  dateLocal: string;     // "2026-12-20T21:00" (datetime-local)
-  imageName: string;      // "/assets/img/locandina1.jpeg" oppure URL assoluto
+  dateLocal: string; // "2026-12-20T21:00" (datetime-local)
+  imageName: string; // "/assets/img/locandina1.jpeg" oppure URL assoluto
   cta: string;
   href: string;
   disponibile: boolean;
@@ -74,7 +74,7 @@ export default function NuovoEventoPage() {
       const payload = {
         title: form.title.trim(),
         description: form.description.trim(),
-        image: form.imageName.trim() || "locandina1.jpeg",
+        imageUrl: form.imageName.trim() || "/assets/img/locandina1.jpeg",
         cta: form.cta.trim() || undefined,
         href: form.href.trim() || undefined,
         disponibile: !!form.disponibile,
@@ -112,7 +112,8 @@ export default function NuovoEventoPage() {
       <header className={styles.header}>
         <h1 className={styles.title}>Aggiungi evento</h1>
         <p className={styles.sub}>
-          Inserisci i dati dell’evento. Sì, anche l’immagine. No, non è telepatia.
+          Inserisci i dati dell’evento. Sì, anche l’immagine. No, non è
+          telepatia.
         </p>
       </header>
 
@@ -169,37 +170,25 @@ export default function NuovoEventoPage() {
           </label>
         </div>
 
-        <label className={styles.field}>
-          <span className={styles.label}>Immagine (URL o path)</span>
-          <input
-  className={styles.input}
-  value={form.imageName}
-  onChange={(e) => onChange("imageName", e.target.value)}
-  placeholder="locandina1.jpeg"
-/>
-<span className={styles.hint}>
-  Il file deve esistere in <code>/public/assets/img</code>
-</span>
-
-
-        </label>
-      {form.imageName && (
-  <div style={{ marginTop: 8, maxWidth: 420 }}>
-    <Image
-      src={`/assets/img/${form.imageName}`}
-      alt="Anteprima locandina"
-      width={420}
-      height={560}
-      style={{
-        width: "100%",
-        height: "auto",
-        borderRadius: 12,
-        border: "1px solid rgba(221,187,121,.2)",
-      }}
-    />
-  </div>
-)}
-
+        <div className={styles.field}>
+          <span className={styles.label}>Immagine Evento</span>
+          <ImageUploader
+            currentImageUrl={form.imageName}
+            onImageUploaded={(url) => onChange("imageName", url)}
+          />
+          <div style={{ marginTop: 12 }}>
+            <span className={styles.hint}>
+              Oppure inserisci manualmente URL:
+            </span>
+            <input
+              className={styles.input}
+              value={form.imageName}
+              onChange={(e) => onChange("imageName", e.target.value)}
+              placeholder="https://... oppure /assets/img/locandina1.jpeg"
+              style={{ marginTop: 4 }}
+            />
+          </div>
+        </div>
 
         <div className={styles.row}>
           <label className={styles.field}>

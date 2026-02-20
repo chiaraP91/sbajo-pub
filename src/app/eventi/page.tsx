@@ -28,7 +28,7 @@ export type EventItem = {
   month: string;
   title: string;
   description: string;
-  image: string;
+  imageUrl: string;
   cta?: string;
   href?: string;
 };
@@ -75,7 +75,7 @@ export default async function EventiPage() {
 
               <div className={styles.eventImageWrapper}>
                 <Image
-                  src={`/assets/img/${e.image}`}
+                  src={e.imageUrl}
                   className={styles.eventImage}
                   alt={e.title}
                   width={1200}
