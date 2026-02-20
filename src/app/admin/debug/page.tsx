@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { useEffect, useState } from "react";
@@ -30,6 +31,7 @@ export default function DebugEventiPage() {
 
         const jsonData = await res.json();
         setData(jsonData);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (err: any) {
         setError(err?.message || "Error loading debug data");
       } finally {

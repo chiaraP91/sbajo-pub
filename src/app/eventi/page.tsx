@@ -40,7 +40,8 @@ async function getEvents(): Promise<EventItem[]> {
 
   const url = `${proto}://${host}/api/eventi`;
 
-  const res = await fetch(url, { next: { revalidate: 3600 } });
+  // Disable caching to always fetch fresh data while debugging
+  const res = await fetch(url, { next: { revalidate: 0 } });
   if (!res.ok) return [];
 
   const ct = res.headers.get("content-type") || "";
