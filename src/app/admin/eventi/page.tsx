@@ -75,6 +75,9 @@ export default function AdminEventiPage() {
         <Link href="/admin/nuovo" className={styles.primaryBtn}>
           + Nuovo Evento
         </Link>
+        <Link href="/admin/disponibilita" className={styles.secondaryBtn}>
+          Torna al menu
+        </Link>
       </header>
 
       {loading && <div className={styles.loading}>Caricamento eventi...</div>}

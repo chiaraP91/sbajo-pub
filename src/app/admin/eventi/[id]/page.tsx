@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState, use } from "react";
 import { useRouter } from "next/navigation";
 import styles from "@/styles/admin-eventi.module.scss";
 
@@ -11,8 +11,8 @@ import ImageUploader from "@/components/ImageUploader";
 type FormState = {
   title: string;
   description: string;
-  dateLocal: string; // "2026-12-20T21:00" (datetime-local)
-  imageName: string; // "/assets/img/locandina1.jpeg" oppure URL assoluto
+  dateLocal: string;
+  imageName: string;
   cta: string;
   href: string;
   disponibile: boolean;
@@ -34,17 +34,65 @@ function toISOZ(local: string) {
   return d.toISOString();
 }
 
-export default function NuovoEventoPage() {
+function fromISO(iso: string) {
+  if (!iso) return "";
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return "";
+  // Format to datetime-local: YYYY-MM-DDTHH:mm
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  const hours = String(d.getHours()).padStart(2, "0");
+  const minutes = String(d.getMinutes()).padStart(2, "0");
+  return `${year}-${month}-${day}T${hours}:${minutes}`;
+}
+
+export default function ModificaEventoPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = use(params);
   const router = useRouter();
 
   const [form, setForm] = useState<FormState>(initialState);
   const [saving, setSaving] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [okMsg, setOkMsg] = useState<string | null>(null);
 
   const canSave = useMemo(() => {
     return form.title.trim().length >= 2 && form.description.trim().length >= 5;
   }, [form.title, form.description]);
+
+  useEffect(() => {
+    loadEvento();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id]);
+
+  async function loadEvento() {
+    try {
+      setLoading(true);
+      const res = await fetch(`/api/admin/eventi/${id}`);
+      if (!res.ok) throw new Error("Evento non trovato");
+
+      const data = await res.json();
+
+      setForm({
+        title: data.title || "",
+        description: data.description || "",
+        dateLocal: data.dateISO ? fromISO(data.dateISO) : "",
+        imageName: data.imageUrl || "",
+        cta: data.cta || "Prenota il tuo posto",
+        href: data.href || "/prenota",
+        disponibile: data.disponibile !== false,
+      });
+    } catch (err: any) {
+      setError(err?.message || "Errore nel caricamento evento");
+    } finally {
+      setLoading(false);
+    }
+  }
 
   const onChange = <K extends keyof FormState>(key: K, value: FormState[K]) => {
     setForm((p) => ({ ...p, [key]: value }));
@@ -62,7 +110,7 @@ export default function NuovoEventoPage() {
     setOkMsg(null);
 
     if (!canSave) {
-      setError("Compila almeno titolo e descrizione (non due lettere a caso).");
+      setError("Compila almeno titolo e descrizione.");
       return;
     }
 
@@ -81,8 +129,8 @@ export default function NuovoEventoPage() {
         dateISO: form.dateLocal ? toISOZ(form.dateLocal) : undefined,
       };
 
-      const res = await fetch("/api/admin/eventi" as any, {
-        method: "POST",
+      const res = await fetch(`/api/admin/eventi/${id}`, {
+        method: "PUT",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
@@ -96,25 +144,33 @@ export default function NuovoEventoPage() {
         throw new Error(data?.error || "Errore durante il salvataggio.");
       }
 
-      setOkMsg("Evento creato ✅");
-      setForm(initialState);
+      setOkMsg("Evento aggiornato ✅");
 
-      router.push("/admin/eventi");
+      setTimeout(() => {
+        router.push("/admin/eventi");
+      }, 1500);
     } catch (err: any) {
-      setError(err?.message || "Errore sconosciuto (il classico).");
+      setError(err?.message || "Errore sconosciuto.");
     } finally {
       setSaving(false);
     }
   }
 
+  if (loading) {
+    return (
+      <div className={styles.page}>
+        <div className={styles.loading}>Caricamento evento...</div>
+      </div>
+    );
+  }
+
   return (
     <div className={styles.page}>
       <header className={styles.header}>
-        <h1 className={styles.title}>Aggiungi evento</h1>
-        <p className={styles.sub}>
-          Inserisci i dati dell’evento. Sì, anche l’immagine. No, non è
-          telepatia.
-        </p>
+        <div>
+          <h1 className={styles.title}>Modifica evento</h1>
+          <p className={styles.sub}>Aggiorna i dettagli dell'evento</p>
+        </div>
       </header>
 
       <form className={styles.form} onSubmit={onSubmit}>
@@ -164,7 +220,7 @@ export default function NuovoEventoPage() {
                 onChange={(e) => onChange("disponibile", e.target.checked)}
               />
               <span className={styles.hint}>
-                Se disattivo, l’evento non esce sul sito.
+                Se disattivo, l'evento non esce sul sito.
               </span>
             </div>
           </label>
@@ -205,7 +261,6 @@ export default function NuovoEventoPage() {
             <span className={styles.label}>Link bottone</span>
             <input
               className={styles.input}
-              readOnly={true}
               value={form.href}
               onChange={(e) => onChange("href", e.target.value)}
               placeholder="/prenota"
@@ -231,7 +286,7 @@ export default function NuovoEventoPage() {
             className={styles.primaryBtn}
             disabled={!canSave || saving}
           >
-            {saving ? "Salvo..." : "Salva evento"}
+            {saving ? "Salvo..." : "Aggiorna evento"}
           </button>
         </div>
       </form>
