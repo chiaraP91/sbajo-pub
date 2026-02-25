@@ -5,7 +5,8 @@ import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import styles from "@/styles/admin-eventi.module.scss";
 
-import { auth } from "@/lib/firebase";
+import { auth, db } from "@/lib/firebase";
+import { collection, addDoc } from "firebase/firestore";
 import ImageUploader from "@/components/ImageUploader";
 
 type FormState = {
@@ -69,32 +70,25 @@ export default function NuovoEventoPage() {
     setSaving(true);
     try {
       const user = await ensureLoggedIn();
-      const token = await user.getIdToken();
 
-      const payload = {
+      const payload: any = {
         title: form.title.trim(),
         description: form.description.trim(),
         imageUrl: form.imageName.trim() || "/assets/img/locandina1.jpeg",
-        cta: form.cta.trim() || undefined,
-        href: form.href.trim() || undefined,
         disponibile: !!form.disponibile,
-        dateISO: form.dateLocal ? toISOZ(form.dateLocal) : undefined,
       };
 
-      const res = await fetch("/api/admin/eventi" as any, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(payload),
-      });
-
-      const data = await res.json().catch(() => ({}));
-
-      if (!res.ok) {
-        throw new Error(data?.error || "Errore durante il salvataggio.");
+      if (form.cta.trim()) {
+        payload.cta = form.cta.trim();
       }
+      if (form.href.trim()) {
+        payload.href = form.href.trim();
+      }
+      if (form.dateLocal) {
+        payload.dateISO = toISOZ(form.dateLocal);
+      }
+
+      await addDoc(collection(db, "eventi"), payload);
 
       setOkMsg("Evento creato ✅");
       setForm(initialState);

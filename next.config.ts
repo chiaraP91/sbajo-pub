@@ -1,8 +1,9 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  output: "export", // Static HTML export for Firebase Hosting
   images: {
-    unoptimized: false,
+    unoptimized: true,
     remotePatterns: [],
     formats: ["image/avif", "image/webp"],
   },

@@ -259,3 +259,59 @@
   gap: 16px;
   place-items: center;
 }
+
+// Modal styles
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  z-index: 1000;
+  backdrop-filter: blur(4px);
+}
+
+.modalContent {
+  background: rgba(11, 12, 15, 0.95);
+  border: 1px solid rgba(221, 187, 121, 0.18);
+  border-radius: 18px;
+  padding: 28px;
+  max-width: 600px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 25px 80px rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(8px);
+
+  h2 {
+    margin: 0 0 20px;
+    font-size: 24px;
+    color: rgba(255, 255, 255, 0.95);
+  }
+
+  .field {
+    margin-bottom: 16px;
+  }
+
+  textarea {
+    resize: vertical;
+    font-family: inherit;
+  }
+}
+
+.modalActions {
+  display: flex;
+  gap: 12px;
+  margin-top: 24px;
+  justify-content: flex-end;
+
+  button {
+    flex: 1;
+    min-width: 120px;
+
+    @media (min-width: 480px) {
+      flex: 0 1 auto;
+    }
+  }
+}

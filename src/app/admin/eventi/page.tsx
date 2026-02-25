@@ -3,9 +3,10 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { auth } from "@/lib/firebase";
+import { auth, db } from "@/lib/firebase";
+import { collection, getDocs, updateDoc, deleteDoc, doc } from "firebase/firestore";
 import styles from "@/styles/admin-eventi.module.scss";
+import ImageUploader from "@/components/ImageUploader";
 
 type EventItem = {
   id: string;
@@ -14,15 +15,22 @@ type EventItem = {
   imageUrl: string;
   disponibile: boolean;
   dateISO?: string;
-  day?: string;
-  month?: string;
+  cta?: string;
+  href?: string;
+};
+
+type EditingEvent = EventItem & {
+  dateLocal: string;
+  cta: string;
+  href: string;
 };
 
 export default function AdminEventiPage() {
-  const router = useRouter();
   const [events, setEvents] = useState<EventItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [editingEvent, setEditingEvent] = useState<EditingEvent | null>(null);
+  const [updatingId, setUpdatingId] = useState<string | null>(null);
 
   useEffect(() => {
     loadEvents();
@@ -31,11 +39,12 @@ export default function AdminEventiPage() {
   async function loadEvents() {
     try {
       setLoading(true);
-      const res = await fetch("/api/eventi");
-      if (!res.ok) throw new Error("Errore nel caricamento eventi");
-
-      const data = await res.json();
-      setEvents(data);
+      const querySnapshot = await getDocs(collection(db, "eventi"));
+      const eventData: EventItem[] = querySnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
+      })) as EventItem[];
+      setEvents(eventData);
     } catch (err: any) {
       setError(err?.message || "Errore nel caricamento eventi");
     } finally {
@@ -50,21 +59,59 @@ export default function AdminEventiPage() {
       const user = auth.currentUser;
       if (!user) throw new Error("Non autenticata");
 
-      const token = await user.getIdToken();
-
-      const res = await fetch(`/api/admin/eventi/${id}`, {
-        method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      if (!res.ok) throw new Error("Errore nell'eliminazione");
-
-      // Ricarica lista
+      await deleteDoc(doc(db, "eventi", id));
       loadEvents();
     } catch (err: any) {
       alert(err?.message || "Errore nell'eliminazione");
+    }
+  }
+
+  function openEdit(event: EventItem) {
+    const dateLocal = event.dateISO
+      ? new Date(event.dateISO).toISOString().slice(0, 16)
+      : "";
+
+    setEditingEvent({
+      ...event,
+      dateLocal,
+      cta: event.cta || "Prenota il tuo posto",
+      href: event.href || "/prenota",
+    });
+  }
+
+  async function handleSaveEdit() {
+    if (!editingEvent) return;
+
+    try {
+      setUpdatingId(editingEvent.id);
+      const user = auth.currentUser;
+      if (!user) throw new Error("Non autenticata");
+
+      const dateISO = editingEvent.dateLocal
+        ? new Date(editingEvent.dateLocal).toISOString()
+        : undefined;
+
+      const updatePayload: any = {
+        title: editingEvent.title,
+        description: editingEvent.description,
+        imageUrl: editingEvent.imageUrl,
+        cta: editingEvent.cta,
+        href: editingEvent.href,
+        disponibile: editingEvent.disponibile,
+      };
+
+      if (dateISO) {
+        updatePayload.dateISO = dateISO;
+      }
+
+      await updateDoc(doc(db, "eventi", editingEvent.id), updatePayload);
+
+      setEditingEvent(null);
+      loadEvents();
+    } catch (err: any) {
+      alert(err?.message || "Errore nell'aggiornamento");
+    } finally {
+      setUpdatingId(null);
     }
   }
 
@@ -81,7 +128,6 @@ export default function AdminEventiPage() {
       </header>
 
       {loading && <div className={styles.loading}>Caricamento eventi...</div>}
-
       {error && <div className={styles.alertError}>{error}</div>}
 
       {!loading && !error && events.length === 0 && (
@@ -123,7 +169,7 @@ export default function AdminEventiPage() {
 
               <div className={styles.eventActions}>
                 <button
-                  onClick={() => router.push(`/admin/eventi/${event.id}`)}
+                  onClick={() => openEdit(event)}
                   className={styles.secondaryBtn}
                 >
                   Modifica
@@ -137,6 +183,138 @@ export default function AdminEventiPage() {
               </div>
             </article>
           ))}
+        </div>
+      )}
+
+      {/* Edit Modal */}
+      {editingEvent && (
+        <div className={styles.modal}>
+          <div className={styles.modalContent}>
+            <h2>Modifica Evento</h2>
+
+            <div className={styles.field}>
+              <label className={styles.label}>Titolo</label>
+              <input
+                type="text"
+                className={styles.input}
+                value={editingEvent.title}
+                onChange={(e) =>
+                  setEditingEvent({ ...editingEvent, title: e.target.value })
+                }
+              />
+            </div>
+
+            <div className={styles.field}>
+              <label className={styles.label}>Descrizione</label>
+              <textarea
+                className={styles.textarea}
+                value={editingEvent.description}
+                onChange={(e) =>
+                  setEditingEvent({
+                    ...editingEvent,
+                    description: e.target.value,
+                  })
+                }
+                rows={3}
+              />
+            </div>
+
+            <div className={styles.field}>
+              <label className={styles.label}>Data e Ora</label>
+              <input
+                type="datetime-local"
+                className={styles.input}
+                value={editingEvent.dateLocal}
+                onChange={(e) =>
+                  setEditingEvent({
+                    ...editingEvent,
+                    dateLocal: e.target.value,
+                  })
+                }
+              />
+            </div>
+
+            <div className={styles.field}>
+              <label className={styles.label}>Immagine URL</label>
+              <input
+                type="text"
+                className={styles.input}
+                value={editingEvent.imageUrl}
+                onChange={(e) =>
+                  setEditingEvent({
+                    ...editingEvent,
+                    imageUrl: e.target.value,
+                  })
+                }
+              />
+              <p style={{ fontSize: "0.9em", marginTop: "8px", opacity: 0.7 }}>
+                Oppure carica una nuova:
+              </p>
+              <ImageUploader
+                currentImageUrl={editingEvent.imageUrl}
+                onImageUploaded={(url) =>
+                  setEditingEvent({ ...editingEvent, imageUrl: url })
+                }
+              />
+            </div>
+
+            <div className={styles.field}>
+              <label className={styles.label}>Testo Bottone CTA</label>
+              <input
+                type="text"
+                className={styles.input}
+                value={editingEvent.cta}
+                onChange={(e) =>
+                  setEditingEvent({ ...editingEvent, cta: e.target.value })
+                }
+              />
+            </div>
+
+            <div className={styles.field}>
+              <label className={styles.label}>URL Bottone CTA</label>
+              <input
+                type="text"
+                className={styles.input}
+                value={editingEvent.href}
+                onChange={(e) =>
+                  setEditingEvent({ ...editingEvent, href: e.target.value })
+                }
+              />
+            </div>
+
+            <div className={styles.field}>
+              <label className={styles.label}>
+                <input
+                  type="checkbox"
+                  checked={editingEvent.disponibile}
+                  onChange={(e) =>
+                    setEditingEvent({
+                      ...editingEvent,
+                      disponibile: e.target.checked,
+                    })
+                  }
+                  style={{ marginRight: "8px" }}
+                />
+                Evento disponibile
+              </label>
+            </div>
+
+            <div className={styles.modalActions}>
+              <button
+                onClick={handleSaveEdit}
+                disabled={updatingId === editingEvent.id}
+                className={styles.primaryBtn}
+              >
+                {updatingId === editingEvent.id ? "Salvataggio..." : "Salva"}
+              </button>
+              <button
+                onClick={() => setEditingEvent(null)}
+                className={styles.secondaryBtn}
+              >
+                Annulla
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>

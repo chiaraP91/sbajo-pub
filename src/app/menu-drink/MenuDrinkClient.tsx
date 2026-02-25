@@ -4,8 +4,22 @@
 import styles from "@/styles/menu.module.scss";
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { db } from "@/lib/firebase";
+import { collection, getDocs } from "firebase/firestore";
 
 type FoodMin = { numericId: number; name: string };
+
+type Drink = {
+  numericId?: number;
+  name: string;
+  description?: string;
+  category?: string;
+  price?: number | null;
+  allergens?: string[];
+  linkFoodId?: number | null;
+  linkDrinkId?: number | null;
+  disponibile?: boolean;
+};
 
 type DrinkMin = {
   numericId: number;
@@ -58,13 +72,50 @@ export const ALLERGENS = [
 ] as const;
 
 export default function MenuDrinkClient({
-  drinks,
-  food,
+  drinks: initialDrinks = [],
+  food: initialFood = [],
 }: {
-  drinks: DrinkMin[];
-  food: FoodMin[];
-}) {
+  drinks?: DrinkMin[];
+  food?: FoodMin[];
+} = {}) {
+  const [drinks, setDrinks] = useState<DrinkMin[]>(initialDrinks);
+  const [food, setFood] = useState<FoodMin[]>(initialFood);
+  const [loading, setLoading] = useState(!initialDrinks.length);
   const [hash, setHash] = useState<string>("");
+
+  useEffect(() => {
+    if (initialDrinks.length > 0) return;
+
+    async function loadFromFirestore() {
+      try {
+        setLoading(true);
+        const querySnapshot = await getDocs(collection(db, "menu-drink"));
+        const items: DrinkMin[] = querySnapshot.docs
+          .map((doc) => {
+            const data = doc.data() as Drink;
+            return {
+              numericId: data.numericId || 0,
+              name: data.name || "",
+              description: data.description || "",
+              category: data.category || "altro",
+              price: data.price || null,
+              allergens: data.allergens || [],
+              linkFoodId: data.linkFoodId || null,
+              linkDrinkId: data.linkDrinkId || null,
+              disponibile: data.disponibile !== false,
+            };
+          })
+          .filter((d) => d.disponibile);
+        setDrinks(items);
+      } catch (err) {
+        console.error("Error loading drinks from Firestore:", err);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    loadFromFirestore();
+  }, [initialDrinks.length]);
 
   useEffect(() => {
     const onHash = () => setHash(window.location.hash || "");
@@ -134,6 +185,10 @@ export default function MenuDrinkClient({
 
     return [...known, ...others].map((k) => [k, groupedSorted[k]] as const);
   }, [groupedSorted]);
+
+  if (loading) {
+    return <p className={styles.empty}>Sto caricando il menu drink…</p>;
+  }
 
   if (!orderedSections.length) {
     return <p className={styles.empty}>Il menu drink non è disponibile al momento.</p>;

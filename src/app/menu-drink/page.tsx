@@ -5,7 +5,8 @@ import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import HeroCarousel from "@/components/HeroCarousel";
 import MenuDrinkClient from "./MenuDrinkClient";
-import { headers } from "next/headers";
+
+export const dynamic = "force-static";
 
 const drinkImages = [
   "/assets/img/sbajo-57.jpg",
@@ -36,47 +37,7 @@ export const metadata: Metadata = {
   },
 };
 
-type FoodMin = { numericId: number; name: string };
-
-type DrinkMin = {
-  numericId: number;
-  name: string;
-  description: string;
-  category: string;
-  price: number | null;
-  allergens: string[];
-  linkFoodId: number | null;
-  linkDrinkId: number | null;
-  disponibile: boolean;
-};
-
-async function getMenuDrinkPageData(): Promise<{
-  drinks: DrinkMin[];
-  food: FoodMin[];
-}> {
-  const h = await headers();
-  const host = h.get("host");
-  const proto = process.env.NODE_ENV === "development" ? "http" : "https";
-
-  const url = `${proto}://${host}/api/menu-drink-page`;
-
-  const res = await fetch(url, { next: { revalidate: 3600 } });
-
-  if (!res.ok) return { drinks: [], food: [] };
-
-  const ct = res.headers.get("content-type") || "";
-  if (!ct.includes("application/json")) {
-    const t = await res.text();
-    console.error("Expected JSON, got:", ct, t.slice(0, 200));
-    return { drinks: [], food: [] };
-  }
-
-  return res.json();
-}
-
-export default async function MenuDrinkPage() {
-  const { drinks, food } = await getMenuDrinkPageData();
-
+export default function MenuDrinkPage() {
   return (
     <div className={styles.wrapper}>
       <HeroCarousel images={drinkImages} />
@@ -84,7 +45,7 @@ export default async function MenuDrinkPage() {
       <Header />
 
       <main id="menu-scroll" className={styles.scrollArea}>
-        <MenuDrinkClient drinks={drinks} food={food} />
+        <MenuDrinkClient />
       </main>
 
       <Footer />

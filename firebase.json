@@ -4,27 +4,20 @@
     "indexes": "firestore.indexes.json"
   },
   "hosting": {
-    "public": "public",
+    "public": "out",
     "ignore": [
       "firebase.json",
       "**/.*",
       "**/node_modules/**",
-      "**/.next/**",
       "**/dist/**",
       "Dockerfile",
       ".dockerignore",
       "functions/**",
-      "**/*.md"
+      "**/*.md",
+      "src/**",
+      "scripts/**"
     ],
-    "rewrites": [
-      {
-        "source": "**",
-        "run": {
-          "serviceId": "sbajo-nextjs",
-          "region": "us-central1"
-        }
-      }
-    ],
-    "cleanUrls": true
+    "cleanUrls": true,
+    "trailingSlash": false
   }
 }

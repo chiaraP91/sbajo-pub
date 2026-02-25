@@ -4,17 +4,19 @@
 import styles from "@/styles/menu.module.scss";
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { db } from "@/lib/firebase";
+import { collection, getDocs } from "firebase/firestore";
 
 type Food = {
-  numericId: number;
+  numericId?: number;
   name: string;
-  description: string;
-  category: string;
-  price: number | null;
-  allergens: number[];
-  linkFoodId: number | null;
-  linkDrinkId: number | null;
-  disponibile: boolean;
+  description?: string;
+  category?: string;
+  price?: number | null;
+  allergens?: string[];
+  linkFoodId?: number | null;
+  linkDrinkId?: number | null;
+  disponibile?: boolean;
 };
 
 type DrinkMin = { numericId: number; name: string };
@@ -49,13 +51,59 @@ export const ALLERGENS = [
 ] as const;
 
 export default function MenuFoodClient({
-  menu,
-  drinks,
+  menu: initialMenu = [],
+  drinks: initialDrinks = [],
 }: {
-  menu: Food[];
-  drinks: DrinkMin[];
-}) {
+  menu?: any[];
+  drinks?: DrinkMin[];
+} = {}) {
+  const [menu, setMenu] = useState(initialMenu);
+  const [drinks, setDrinks] = useState(initialDrinks);
+  const [loading, setLoading] = useState(!initialMenu.length);
   const [hash, setHash] = useState<string>("");
+
+  useEffect(() => {
+    if (initialMenu.length > 0) return;
+
+    async function loadFromFirestore() {
+      try {
+        setLoading(true);
+        const querySnapshot = await getDocs(collection(db, "menu-food"));
+        const items: any[] = querySnapshot.docs
+          .map((doc) => {
+            const data = doc.data();
+            return {
+              numericId: data.numericId || 0,
+              name: data.name || "",
+              description: data.description || "",
+              category: data.category || "altro",
+              price: data.price || null,
+              allergens: data.allergens || [],
+              linkFoodId: data.linkFoodId || null,
+              linkDrinkId: data.linkDrinkId || null,
+              disponibile: data.disponibile !== false,
+            };
+          })
+          .filter((f) => f.disponibile);
+        setMenu(items);
+      } catch (err) {
+        console.error("Error loading food from Firestore:", err);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    loadFromFirestore();
+  }, [initialMenu.length]);
+
+  const [hashState, setHashState] = useState<string>("");
+
+  useEffect(() => {
+    const onHash = () => setHashState(window.location.hash || "");
+    onHash();
+    window.addEventListener("hashchange", onHash);
+    return () => window.removeEventListener("hashchange", onHash);
+  }, []);
 
   const scrollToHash = useCallback((h: string) => {
     const scrollContainer = document.getElementById("menu-scroll");
@@ -86,10 +134,10 @@ export default function MenuFoodClient({
   }, []);
 
   useEffect(() => {
-    const h = window.location.hash;
+    const h = hashState;
     if (!h) return;
     scrollToHash(h);
-  }, [scrollToHash, menu]);
+  }, [hashState, menu, scrollToHash]);
 
   const drinkById = useMemo(() => {
     const map = new Map<number, DrinkMin>();
@@ -104,11 +152,14 @@ export default function MenuFoodClient({
   }, [menu]);
 
   const grouped = useMemo(() => {
-    return (menu ?? []).reduce((acc, item) => {
-      const cat = normalizeCategory(item.category);
-      (acc[cat] ??= []).push(item);
-      return acc;
-    }, {} as Record<string, Food[]>);
+    return (menu ?? []).reduce(
+      (acc, item) => {
+        const cat = normalizeCategory(item.category);
+        (acc[cat] ??= []).push(item);
+        return acc;
+      },
+      {} as Record<string, Food[]>,
+    );
   }, [menu]);
 
   const GROUP_ORDER = ["appetizer", "burger", "dolci", "altro"] as const;
@@ -123,8 +174,14 @@ export default function MenuFoodClient({
     return [...known, ...others].map((k) => [k, grouped[k]] as const);
   }, [grouped]);
 
+  if (loading) {
+    return <p className={styles.empty}>Sto caricando il menu…</p>;
+  }
+
   if (!orderedSections.length) {
-    return <p className={styles.empty}>Il menu non è disponibile al momento.</p>;
+    return (
+      <p className={styles.empty}>Il menu non è disponibile al momento.</p>
+    );
   }
 
   return (
@@ -134,12 +191,16 @@ export default function MenuFoodClient({
           <h2 className={styles.heading}>{labelCategory(tipologia)}</h2>
 
           <ul className={styles.list}>
-            {items.map((item) => {
+            {items.map((item: any) => {
               const linkedFood =
-                item.linkFoodId != null ? foodById.get(item.linkFoodId) : undefined;
+                item.linkFoodId != null
+                  ? foodById.get(item.linkFoodId)
+                  : undefined;
 
               const linkedDrink =
-                item.linkDrinkId != null ? drinkById.get(item.linkDrinkId) : undefined;
+                item.linkDrinkId != null
+                  ? drinkById.get(item.linkDrinkId)
+                  : undefined;
 
               return (
                 <li
@@ -163,7 +224,9 @@ export default function MenuFoodClient({
 
                     {linkedFood && (
                       <div className={styles.pairing}>
-                        <span className={styles.pairingLabel}>Provalo con:</span>
+                        <span className={styles.pairingLabel}>
+                          Provalo con:
+                        </span>
 
                         <a
                           href={`#food-${linkedFood.numericId}`}
@@ -178,7 +241,9 @@ export default function MenuFoodClient({
                           }}
                         >
                           <span className={styles.pairingIcon}>🍴</span>
-                          <span className={styles.pairingText}>{linkedFood.name}</span>
+                          <span className={styles.pairingText}>
+                            {linkedFood.name}
+                          </span>
                           <span className={styles.pairingArrow}>›</span>
                         </a>
                       </div>
@@ -186,14 +251,18 @@ export default function MenuFoodClient({
 
                     {linkedDrink && (
                       <div className={styles.pairing}>
-                        <span className={styles.pairingLabel}>Consigliato con</span>
+                        <span className={styles.pairingLabel}>
+                          Consigliato con
+                        </span>
                         <Link
                           href={`/menu-drink#drink-${linkedDrink.numericId}`}
                           className={styles.pairingCard}
                           aria-label={`Vedi ${linkedDrink.name} nel menu drink`}
                         >
                           <span className={styles.pairingIcon}>🍸</span>
-                          <span className={styles.pairingText}>{linkedDrink.name}</span>
+                          <span className={styles.pairingText}>
+                            {linkedDrink.name}
+                          </span>
                           <span className={styles.pairingArrow}>›</span>
                         </Link>
                       </div>
