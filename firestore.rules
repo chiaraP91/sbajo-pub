@@ -2,12 +2,19 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
+    // Menu collections - public read, admin write
     match /menu-drink/{id} {
       allow read: if true;
       allow write: if request.auth != null;
     }
 
     match /menu-food/{id} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+
+    // Eventi collection - public read, admin write
+    match /eventi/{id} {
       allow read: if true;
       allow write: if request.auth != null;
     }
