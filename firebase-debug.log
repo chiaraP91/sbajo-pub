@@ -1,0 +1,40 @@
+[debug] [2026-02-26T09:01:07.907Z] ----------------------------------------------------------------------
+[debug] [2026-02-26T09:01:07.910Z] Command:       C:\nvm4w\nodejs\node.exe C:\Users\Chiar\AppData\Roaming\npm\node_modules\firebase-tools\lib\bin\firebase.js deploy
+[debug] [2026-02-26T09:01:07.910Z] CLI Version:   13.34.0
+[debug] [2026-02-26T09:01:07.910Z] Platform:      win32
+[debug] [2026-02-26T09:01:07.910Z] Node Version:  v24.12.0
+[debug] [2026-02-26T09:01:07.910Z] Time:          Thu Feb 26 2026 10:01:07 GMT+0100 (Ora standard dell’Europa centrale)
+[debug] [2026-02-26T09:01:07.910Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2026-02-26T09:01:08.032Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2026-02-26T09:01:08.032Z] > authorizing via signed-in user (perottochiara@live.it)
+[debug] [2026-02-26T09:01:08.032Z] [iam] checking project sbajopub for permissions ["datastore.indexes.create","datastore.indexes.delete","datastore.indexes.list","datastore.indexes.update","firebase.projects.get","firebasehosting.sites.update"]
+[debug] [2026-02-26T09:01:08.033Z] Checked if tokens are valid: true, expires at: 1772099748452
+[debug] [2026-02-26T09:01:08.033Z] Checked if tokens are valid: true, expires at: 1772099748452
+[debug] [2026-02-26T09:01:08.033Z] >>> [apiv2][query] POST https://cloudresourcemanager.googleapis.com/v1/projects/sbajopub:testIamPermissions [none]
+[debug] [2026-02-26T09:01:08.033Z] >>> [apiv2][(partial)header] POST https://cloudresourcemanager.googleapis.com/v1/projects/sbajopub:testIamPermissions x-goog-quota-user=projects/sbajopub
+[debug] [2026-02-26T09:01:08.034Z] >>> [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/sbajopub:testIamPermissions {"permissions":["datastore.indexes.create","datastore.indexes.delete","datastore.indexes.list","datastore.indexes.update","firebase.projects.get","firebasehosting.sites.update"]}
+[debug] [2026-02-26T09:01:08.864Z] <<< [apiv2][status] POST https://cloudresourcemanager.googleapis.com/v1/projects/sbajopub:testIamPermissions 200
+[debug] [2026-02-26T09:01:08.864Z] <<< [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/sbajopub:testIamPermissions {"permissions":["datastore.indexes.create","datastore.indexes.delete","datastore.indexes.list","datastore.indexes.update","firebase.projects.get","firebasehosting.sites.update"]}
+[debug] [2026-02-26T09:01:08.865Z] Checked if tokens are valid: true, expires at: 1772099748452
+[debug] [2026-02-26T09:01:08.865Z] Checked if tokens are valid: true, expires at: 1772099748452
+[debug] [2026-02-26T09:01:08.865Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/sbajopub [none]
+[debug] [2026-02-26T09:01:09.434Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/sbajopub 200
+[debug] [2026-02-26T09:01:09.434Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/sbajopub {"projectId":"sbajopub","projectNumber":"276468146568","displayName":"Sbajo Cocktail Bar","name":"projects/sbajopub","resources":{"hostingSite":"sbajopub"},"state":"ACTIVE","etag":"1_b702aa64-94fc-4d44-aa02-fdf78859fa41"}
+[info] 
+[info] === Deploying to 'sbajopub'...
+[info] 
+[info] i  deploying firestore, hosting 
+[info] i  firestore: reading indexes from firestore.indexes.json... 
+[info] i  cloud.firestore: checking firestore.rules for compilation errors... 
+[debug] [2026-02-26T09:01:09.440Z] Checked if tokens are valid: true, expires at: 1772099748452
+[debug] [2026-02-26T09:01:09.440Z] Checked if tokens are valid: true, expires at: 1772099748452
+[debug] [2026-02-26T09:01:09.440Z] >>> [apiv2][query] POST https://firebaserules.googleapis.com/v1/projects/sbajopub:test [none]
+[debug] [2026-02-26T09:01:09.440Z] >>> [apiv2][body] POST https://firebaserules.googleapis.com/v1/projects/sbajopub:test [omitted]
+[debug] [2026-02-26T09:01:09.837Z] <<< [apiv2][status] POST https://firebaserules.googleapis.com/v1/projects/sbajopub:test 200
+[debug] [2026-02-26T09:01:09.837Z] <<< [apiv2][body] POST https://firebaserules.googleapis.com/v1/projects/sbajopub:test {}
+[info] +  cloud.firestore: rules file firestore.rules compiled successfully 
+[debug] [2026-02-26T09:01:09.840Z] Checked if tokens are valid: true, expires at: 1772099748452
+[debug] [2026-02-26T09:01:09.840Z] Checked if tokens are valid: true, expires at: 1772099748452
+[debug] [2026-02-26T09:01:09.840Z] >>> [apiv2][query] POST https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/sbajopub/versions [none]
+[debug] [2026-02-26T09:01:09.840Z] >>> [apiv2][body] POST https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/sbajopub/versions {"status":"CREATED","labels":{"deployment-tool":"cli-firebase"}}

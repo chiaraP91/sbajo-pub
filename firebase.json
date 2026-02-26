@@ -5,13 +5,6 @@
   },
   "hosting": {
     "public": "out",
-    "redirects": [
-      {
-        "source": "**",
-        "destination": "https://sbajococktailbar.it",
-        "type": 301
-      }
-    ],
     "ignore": [
       "firebase.json",
       "**/.*",
