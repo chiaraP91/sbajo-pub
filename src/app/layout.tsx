@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import Script from "next/script";
+import CanonicalTag from "@/components/CanonicalTag";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -45,6 +46,9 @@ export const metadata: Metadata = {
     },
   },
   manifest: "/manifest.json",
+  alternates: {
+    canonical: "https://sbajococktailbar.it",
+  },
   openGraph: {
     title: "Sbajo Cocktail Bar | Aprilia",
     description:
@@ -141,6 +145,8 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        {/* Canonical Tag per multi-dominio SEO - Client Component */}
+        <CanonicalTag />
         {children}
       </body>
     </html>

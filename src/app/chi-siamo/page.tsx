@@ -61,18 +61,9 @@ export default function ChiSiamoPage() {
               dove i cocktail hanno personalità, la cucina osa, gli eventi
               sorprendono e l’atmosfera ti invita sempre a fermarti per “un
               ultimo giro”. Vogliamo creare uno spazio in cui chiunque possa
-              sentirsi libero accolto e a proprio agio, anche quando ci Si sente
-              uno Sbajo!
+              sentirsi libero, accolto e a proprio agio, anche quando ci si
+              sente uno Sbajo!
             </p>
-
-            <a
-              className={styles.mapBtn}
-              href={MAPS_URL}
-              target="_blank"
-              rel="noreferrer"
-            >
-              Dove siamo
-            </a>
           </div>
         </section>
 
