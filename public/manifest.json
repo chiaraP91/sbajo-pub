@@ -1,0 +1,52 @@
+{
+  "name": "Sbajo Cocktail Bar",
+  "short_name": "Sbajo",
+  "description": "Cocktail bar con cucina creativa e eventi sbajati ad Aprilia",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#d4af37",
+  "orientation": "portrait-primary",
+  "lang": "it-IT",
+  "dir": "ltr",
+  "scope": "/",
+  "icons": [
+    {
+      "src": "/assets/img/logo3.png",
+      "sizes": "520x520",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["food", "lifestyle", "entertainment"],
+  "shortcuts": [
+    {
+      "name": "Menu Drink",
+      "short_name": "Cocktail",
+      "description": "Scopri i nostri cocktail",
+      "url": "/menu-drink",
+      "icons": [{ "src": "/assets/img/logo3.png", "sizes": "520x520" }]
+    },
+    {
+      "name": "Menu Food",
+      "short_name": "Cucina",
+      "description": "Esplora il menu food",
+      "url": "/menu-food",
+      "icons": [{ "src": "/assets/img/logo3.png", "sizes": "520x520" }]
+    },
+    {
+      "name": "Eventi",
+      "short_name": "Eventi",
+      "description": "Scopri gli eventi",
+      "url": "/eventi",
+      "icons": [{ "src": "/assets/img/logo3.png", "sizes": "520x520" }]
+    },
+    {
+      "name": "Prenota",
+      "short_name": "Prenota",
+      "description": "Prenota il tuo tavolo",
+      "url": "/prenota",
+      "icons": [{ "src": "/assets/img/logo3.png", "sizes": "520x520" }]
+    }
+  ]
+}
