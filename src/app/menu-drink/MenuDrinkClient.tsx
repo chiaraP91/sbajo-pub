@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { db } from "@/lib/firebase";
 import { collection, getDocs } from "firebase/firestore";
+import { getCachedData, setCachedData } from "@/lib/firebase-cache";
 
 type FoodMin = { numericId: number; name: string };
 
@@ -89,6 +90,15 @@ export default function MenuDrinkClient({
     async function loadFromFirestore() {
       try {
         setLoading(true);
+
+        // Controlla cache prima di fare richiesta a Firestore
+        const cachedDrinks = getCachedData<DrinkMin[]>("menu-drink");
+        if (cachedDrinks) {
+          setDrinks(cachedDrinks);
+          setLoading(false);
+          return;
+        }
+
         const querySnapshot = await getDocs(collection(db, "menu-drink"));
         const items: DrinkMin[] = querySnapshot.docs
           .map((doc) => {
@@ -106,6 +116,9 @@ export default function MenuDrinkClient({
             };
           })
           .filter((d) => d.disponibile);
+
+        // Salva in cache
+        setCachedData("menu-drink", items);
         setDrinks(items);
       } catch (err) {
         console.error("Error loading drinks from Firestore:", err);
@@ -162,11 +175,14 @@ export default function MenuDrinkClient({
   }, [food]);
 
   const groupedSorted = useMemo(() => {
-    const grouped = (drinks ?? []).reduce((acc, item) => {
-      const cat = normalizeCategory(item.category);
-      (acc[cat] ??= []).push(item);
-      return acc;
-    }, {} as Record<string, DrinkMin[]>);
+    const grouped = (drinks ?? []).reduce(
+      (acc, item) => {
+        const cat = normalizeCategory(item.category);
+        (acc[cat] ??= []).push(item);
+        return acc;
+      },
+      {} as Record<string, DrinkMin[]>,
+    );
 
     for (const k of Object.keys(grouped)) {
       grouped[k] = [...grouped[k]].sort(priceSort);
@@ -174,7 +190,13 @@ export default function MenuDrinkClient({
     return grouped;
   }, [drinks]);
 
-  const GROUP_ORDER = ["cocktail", "birre", "vini", "soft drink", "altro"] as const;
+  const GROUP_ORDER = [
+    "cocktail",
+    "birre",
+    "vini",
+    "soft drink",
+    "altro",
+  ] as const;
 
   const orderedSections = useMemo(() => {
     const keys = Object.keys(groupedSorted);
@@ -191,7 +213,11 @@ export default function MenuDrinkClient({
   }
 
   if (!orderedSections.length) {
-    return <p className={styles.empty}>Il menu drink non è disponibile al momento.</p>;
+    return (
+      <p className={styles.empty}>
+        Il menu drink non è disponibile al momento.
+      </p>
+    );
   }
 
   return (
@@ -203,10 +229,16 @@ export default function MenuDrinkClient({
           <ul className={styles.list}>
             {items.map((item) => {
               const piatto =
-                item.linkFoodId != null ? foodById.get(item.linkFoodId) : undefined;
+                item.linkFoodId != null
+                  ? foodById.get(item.linkFoodId)
+                  : undefined;
 
               return (
-                <li key={item.numericId} id={`drink-${item.numericId}`} className={styles.item}>
+                <li
+                  key={item.numericId}
+                  id={`drink-${item.numericId}`}
+                  className={styles.item}
+                >
                   <div className={styles.details}>
                     <h4 className={styles.nameItem}>
                       {item.name}
@@ -223,7 +255,9 @@ export default function MenuDrinkClient({
 
                     {piatto && (
                       <div className={styles.pairing}>
-                        <span className={styles.pairingLabel}>Provalo con:</span>
+                        <span className={styles.pairingLabel}>
+                          Provalo con:
+                        </span>
                         <Link
                           href={`/menu-food#food-${piatto.numericId}`}
                           className={styles.pairingCard}
@@ -231,14 +265,18 @@ export default function MenuDrinkClient({
                           scroll={false}
                         >
                           <span className={styles.pairingIcon}>🍴</span>
-                          <span className={styles.pairingText}>{piatto.name}</span>
+                          <span className={styles.pairingText}>
+                            {piatto.name}
+                          </span>
                           <span className={styles.pairingArrow}>›</span>
                         </Link>
                       </div>
                     )}
                   </div>
 
-                  <span className={styles.price}>{item.price != null ? `€${item.price}` : ""}</span>
+                  <span className={styles.price}>
+                    {item.price != null ? `€${item.price}` : ""}
+                  </span>
                 </li>
               );
             })}
@@ -259,7 +297,8 @@ export default function MenuDrinkClient({
         </ul>
 
         <p className={styles.allergensNote}>
-          Per informazioni su ingredienti e possibili contaminazioni crociate rivolgiti al personale.
+          Per informazioni su ingredienti e possibili contaminazioni crociate
+          rivolgiti al personale.
         </p>
       </section>
 

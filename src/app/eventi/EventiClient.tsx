@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import { db } from "@/lib/firebase";
 import { collection, getDocs } from "firebase/firestore";
 import styles from "@/styles/eventi.module.scss";
+import { getCachedData, setCachedData } from "@/lib/firebase-cache";
 
 export type EventItem = {
   id: string;
@@ -58,6 +59,14 @@ export default function EventiClient() {
   useEffect(() => {
     async function loadEvents() {
       try {
+        // Controlla cache prima di fare richiesta a Firestore
+        const cachedEvents = getCachedData<EventItem[]>("eventi");
+        if (cachedEvents) {
+          setItems(cachedEvents);
+          setLoading(false);
+          return;
+        }
+
         const querySnapshot = await getDocs(collection(db, "eventi"));
         const events: EventItem[] = querySnapshot.docs
           .map((doc) => {
@@ -93,6 +102,9 @@ export default function EventiClient() {
           // Get original doc data to check disponibile field
           return true; // For now, show all loaded events
         });
+
+        // Salva in cache
+        setCachedData("eventi", filtered);
         setItems(filtered);
       } catch (err) {
         console.error("Error loading events:", err);

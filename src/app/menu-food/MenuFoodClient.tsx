@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { db } from "@/lib/firebase";
 import { collection, getDocs } from "firebase/firestore";
+import { getCachedData, setCachedData } from "@/lib/firebase-cache";
 
 type Food = {
   numericId?: number;
@@ -68,6 +69,15 @@ export default function MenuFoodClient({
     async function loadFromFirestore() {
       try {
         setLoading(true);
+
+        // Controlla cache prima di fare richiesta a Firestore
+        const cachedMenu = getCachedData<any[]>("menu-food");
+        if (cachedMenu) {
+          setMenu(cachedMenu);
+          setLoading(false);
+          return;
+        }
+
         const querySnapshot = await getDocs(collection(db, "menu-food"));
         const items: any[] = querySnapshot.docs
           .map((doc) => {
@@ -85,6 +95,9 @@ export default function MenuFoodClient({
             };
           })
           .filter((f) => f.disponibile);
+
+        // Salva in cache
+        setCachedData("menu-food", items);
         setMenu(items);
       } catch (err) {
         console.error("Error loading food from Firestore:", err);

@@ -14,6 +14,65 @@ const CLOUDINARY_CLOUD_NAME =
 const CLOUDINARY_UPLOAD_PRESET =
   process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET || "sbajo_eventi";
 
+// Funzione per comprimere le immagini lato client
+async function compressImage(file: File): Promise<File> {
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = (event) => {
+      const img = new window.Image();
+      img.src = event.target?.result as string;
+      img.onload = () => {
+        const canvas = document.createElement("canvas");
+        const ctx = canvas.getContext("2d");
+        if (!ctx) {
+          resolve(file); // Se fallisce, usa il file originale
+          return;
+        }
+
+        // Ridimensiona mantenendo aspect ratio
+        let width = img.width;
+        let height = img.height;
+        const maxWidth = 1200;
+        const maxHeight = 1200;
+
+        if (width > height) {
+          if (width > maxWidth) {
+            height = Math.round((height * maxWidth) / width);
+            width = maxWidth;
+          }
+        } else {
+          if (height > maxHeight) {
+            width = Math.round((width * maxHeight) / height);
+            height = maxHeight;
+          }
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+        ctx.drawImage(img, 0, 0, width, height);
+
+        canvas.toBlob(
+          (blob) => {
+            if (blob) {
+              resolve(
+                new File([blob], file.name, {
+                  type: "image/webp",
+                  lastModified: Date.now(),
+                }),
+              );
+            } else {
+              resolve(file);
+            }
+          },
+          "image/webp",
+          0.8,
+        ); // 80% quality
+      };
+    };
+  });
+}
+
 export default function ImageUploader({
   currentImageUrl,
   onImageUploaded,
@@ -43,11 +102,17 @@ export default function ImageUploader({
     setProgress(30);
 
     try {
+      // Comprimi l'immagine prima dell'upload
+      const compressedFile = await compressImage(file);
+
       // Crea FormData per Cloudinary
       const formData = new FormData();
-      formData.append("file", file);
+      formData.append("file", compressedFile);
       formData.append("upload_preset", CLOUDINARY_UPLOAD_PRESET);
       formData.append("folder", "eventi");
+      // Cloudinary applica ottimizzazioni automatiche
+      formData.append("quality", "auto");
+      formData.append("fetch_format", "auto");
 
       setProgress(50);
 
@@ -71,9 +136,10 @@ export default function ImageUploader({
 
       // URL ottimizzato con trasformazione Cloudinary
       // f_auto = formato automatico (WebP/AVIF), q_auto = qualità automatica
+      // w_1200 = dimensione massima
       const optimizedUrl = data.secure_url.replace(
         "/upload/",
-        "/upload/f_auto,q_auto,w_1200/",
+        "/upload/f_auto,q_auto,w_1200,c_limit/",
       );
 
       setProgress(100);

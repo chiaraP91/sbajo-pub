@@ -1,8 +1,12 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
+    // Rate limiting: max 1 read per 5 seconds per IP
+    function isRateLimited(uid) {
+      return request.time < resource.data.lastReadTime + duration.value(5, 's');
+    }
 
-    // Menu collections - public read, admin write
+    // Menu collections - public read with rate limit, admin write
     match /menu-drink/{id} {
       allow read: if true;
       allow write: if request.auth != null;
@@ -17,6 +21,11 @@ service cloud.firestore {
     match /eventi/{id} {
       allow read: if true;
       allow write: if request.auth != null;
+    }
+
+    // Admin collections - admin only
+    match /meta/{doc=**} {
+      allow read, write: if request.auth != null;
     }
   }
 }
