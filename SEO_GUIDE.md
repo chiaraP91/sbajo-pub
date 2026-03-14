@@ -96,7 +96,7 @@
 
 1. Vai su: https://business.google.com
 2. Clicca "Gestisci ora"
-3. Cerca "Sbajo Cocktail Bar, Aprilia"
+3. Cerca "Sbajo Cocktail Bar, Pomezia"
 4. Se esiste già, rivendica l'attività
 5. Se non esiste, creala inserendo:
    - Nome: Sbajo Cocktail Bar
@@ -137,7 +137,7 @@
 - ✅ Aggiungi link al sito nel profilo
 - ✅ Usa l'indirizzo completo nel profilo business
 - ✅ Condividi link alle pagine del sito nei post
-- ✅ Usa hashtag localizzati: #Aprilia #LazioFood #CocktailBarAprilia
+- ✅ Usa hashtag localizzati: #Pomezia #LazioFood #CocktailBarPomezia
 
 #### Story & Post con link:
 
@@ -277,25 +277,25 @@ Per velocizzare l'indicizzazione:
 
 ### Primarie:
 
-- cocktail bar aprilia
-- aperitivo aprilia
-- ristorante aprilia
-- eventi aprilia
+- cocktail bar Pomezia
+- aperitivo Pomezia
+- ristorante Pomezia
+- eventi Pomezia
 
 ### Secondarie:
 
 - cucina creativa lazio
-- dove mangiare aprilia
-- locali aprilia
+- dove mangiare Pomezia
+- locali Pomezia
 - cocktail artigianali
-- burger gourmet aprilia
+- burger gourmet Pomezia
 
 ### Long-tail:
 
-- "migliori cocktail bar vicino aprilia"
-- "dove fare aperitivo ad aprilia"
-- "ristoranti con eventi aprilia"
-- "cocktail bar con cucina aprilia"
+- "migliori cocktail bar vicino Pomezia"
+- "dove fare aperitivo a Pomezia"
+- "ristoranti con eventi Pomezia"
+- "cocktail bar con cucina Pomezia"
 
 ---
 

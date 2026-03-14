@@ -9,8 +9,8 @@ import HeroCarousel from "@/components/HeroCarousel";
 export const metadata: Metadata = {
   title: "Chi Siamo | Sbajo Cocktail Bar - La Nostra Storia e Atmosfera",
   description:
-    "La storia di Sbajo: cocktail con carattere, cucina creativa ed eventi sbajati. Scopri l'atmosfera unica e chi c'è dietro questo locale ad Aprilia.",
-  keywords: "chi siamo, sbajo, storia, cocktail bar, aprilia, atmosfera",
+    "La storia di Sbajo: cocktail con carattere, cucina creativa ed eventi sbajati. Scopri l'atmosfera unica e chi c'è dietro questo locale a Pomezia.",
+  keywords: "chi siamo, sbajo, storia, cocktail bar, Pomezia, atmosfera",
   alternates: { canonical: "https://sbajococktailbar.it/chi-siamo" },
   openGraph: {
     title: "Chi Siamo | Sbajo Cocktail Bar",

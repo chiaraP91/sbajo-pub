@@ -25,7 +25,7 @@ export const metadata: Metadata = {
   description:
     "Menu drink esclusivo di Sbajo: cocktail signature, birre artigianali, vini selezionati e soft drink. Scopri le nostre creazioni uniche.",
   keywords:
-    "cocktail Aprilia, birre Aprilia, vini, aperitivo, drink, menu cocktail",
+    "cocktail Pomezia, birre Pomezia, vini, aperitivo, drink, menu cocktail",
   alternates: { canonical: "https://sbajococktailbar.it/menu-drink" },
   openGraph: {
     title: "Menu Drink | Sbajo Cocktail Bar",

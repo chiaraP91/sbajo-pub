@@ -17,8 +17,8 @@ const foodImages = [
 export const metadata: Metadata = {
   title: "Menu Food | Sbajo Cocktail Bar - Cucina Creativa, Burger, Dolci",
   description:
-    "Menu food di Sbajo: piatti creativi, burger gourmet, dolci homemade e appetizer sfiziosissimi. Scopri la cucina creativa adAprilia.",
-  keywords: "cucina creativa Aprilia, burger Aprilia, dolci, cena, menu, food",
+    "Menu food di Sbajo: piatti creativi, burger gourmet, dolci homemade e appetizer sfiziosissimi. Scopri la cucina creativa a Pomezia.",
+  keywords: "cucina creativa Pomezia, burger Pomezia, dolci, cena, menu, food",
   alternates: { canonical: "https://sbajococktailbar.it/menu-food" },
   openGraph: {
     title: "Menu Food | Sbajo Cocktail Bar",

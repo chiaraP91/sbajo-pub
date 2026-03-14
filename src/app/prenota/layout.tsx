@@ -3,8 +3,8 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Prenota | Sbajo Cocktail Bar - Prenotazione Tavolo Online",
   description:
-    "Prenota il tuo tavolo a Sbajo Cocktail Bar ad Aprilia. Semplice, veloce e online.",
-  keywords: "prenota, prenotazione, tavolo, aprilia, cocktail bar",
+    "Prenota il tuo tavolo a Sbajo Cocktail Bar a Pomezia. Semplice, veloce e online.",
+  keywords: "prenota, prenotazione, tavolo, Pomezia, cocktail bar",
   alternates: { canonical: "https://sbajococktailbar.it/prenota" },
   openGraph: {
     title: "Prenota | Sbajo Cocktail Bar",

@@ -12,8 +12,8 @@ export const dynamic = "force-static";
 export const metadata: Metadata = {
   title: "Eventi | Sbajo Cocktail Bar - Serate Speciali e Appuntamenti",
   description:
-    "Eventi sbajati, serate speciali, live music e appuntamenti imperdibili. Scopri gli eventi di Sbajo Cocktail Bar ad Aprilia.",
-  keywords: "eventi Aprilia, serate Aprilia, live music, aperitivo, festa",
+    "Eventi sbajati, serate speciali, live music e appuntamenti imperdibili. Scopri gli eventi di Sbajo Cocktail Bar a Pomezia.",
+  keywords: "eventi Pomezia, serate Pomezia, live music, aperitivo, festa",
   alternates: { canonical: "https://sbajococktailbar.it/eventi" },
   openGraph: {
     title: "Eventi | Sbajo Cocktail Bar",

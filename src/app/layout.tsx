@@ -16,11 +16,11 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://sbajococktailbar.it"),
-  title: "Sbajo Cocktail Bar | Cocktail, Cucina Creativa, Eventi ad Aprilia",
+  title: "Sbajo Cocktail Bar | Cocktail, Cucina Creativa, Eventi a Pomezia",
   description:
-    "Sbajo Cocktail Bar ad Aprilia: cocktail con carattere, cucina creativa, eventi sbajati e atmosfera unica. Scopri il nostro menu e prenota online.",
+    "Sbajo Cocktail Bar a Pomezia: cocktail con carattere, cucina creativa, eventi sbajati e atmosfera unica. Scopri il nostro menu e prenota online.",
   keywords:
-    "cocktail bar Aprilia, aperitivo Aprilia, cena Aprilia, eventi Aprilia, cucina creativa, cocktail, birra",
+    "cocktail bar Pomezia, aperitivo Pomezia, cena Pomezia, eventi Pomezia, cucina creativa, cocktail, birra",
   authors: [{ name: "Sbajo Cocktail Bar" }],
   creator: "Sbajo Cocktail Bar",
   publisher: "Sbajo Cocktail Bar",
@@ -50,9 +50,9 @@ export const metadata: Metadata = {
     canonical: "https://sbajococktailbar.it",
   },
   openGraph: {
-    title: "Sbajo Cocktail Bar | Aprilia",
+    title: "Sbajo Cocktail Bar | Pomezia",
     description:
-      "Cocktail con personalità, cucina creativa e serate indimenticabili. Sbajo Cocktail Bar ad Aprilia.",
+      "Cocktail con personalità, cucina creativa e serate indimenticabili. Sbajo Cocktail Bar a Pomezia.",
     url: "https://sbajococktailbar.it",
     type: "website",
     locale: "it_IT",
@@ -69,7 +69,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Sbajo Cocktail Bar",
-    description: "Cocktail, cucina creativa ed eventi sbajati ad Aprilia",
+    description: "Cocktail, cucina creativa ed eventi sbajati a Pomezia",
   },
 };
 
@@ -83,7 +83,7 @@ export default function RootLayout({
     "@type": "Restaurant",
     "@id": "https://sbajococktailbar.it",
     name: "Sbajo Cocktail Bar",
-    description: "Cocktail bar con cucina creativa e eventi sbajati ad Aprilia",
+    description: "Cocktail bar con cucina creativa e eventi sbajati a Pomezia",
     url: "https://sbajococktailbar.it",
     telephone: "+393333807934",
     priceRange: "€€",
@@ -93,7 +93,7 @@ export default function RootLayout({
     address: {
       "@type": "PostalAddress",
       streetAddress: "Via Roma",
-      addressLocality: "Aprilia",
+      addressLocality: "Pomezia",
       addressRegion: "Lazio",
       postalCode: "04011",
       addressCountry: "IT",
