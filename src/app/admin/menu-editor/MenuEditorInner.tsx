@@ -63,7 +63,14 @@ const ALLERGENS: Array<{ code: number; label: string }> = [
 ];
 
 const FOOD_CATEGORIES = ["Appetizer", "Burger", "Dolci", "Altro"] as const;
-const DRINK_CATEGORIES = ["Cocktail", "Birre", "Vini", "Soft drink", "Altro"] as const;
+const DRINK_CATEGORIES = [
+  "Cocktail",
+  "Birre",
+  "Distillati",
+  "Vini",
+  "Soft drink",
+  "Altro",
+] as const;
 
 function toNumberOrNull(v: string): number | null {
   const n = Number(v);
@@ -110,7 +117,7 @@ export default function MenuEditorInner() {
 
   const categories = useMemo(
     () => (menuType === "food" ? [...FOOD_CATEGORIES] : [...DRINK_CATEGORIES]),
-    [menuType]
+    [menuType],
   );
 
   // Se NON sono in edit, quando cambio tipo resetto category/link
@@ -127,15 +134,23 @@ export default function MenuEditorInner() {
 
     try {
       const [foodSnap, drinkSnap] = await Promise.all([
-        getDocs(query(collection(db, "menu-food"), orderBy("numericId", "asc"))),
-        getDocs(query(collection(db, "menu-drink"), orderBy("numericId", "asc"))),
+        getDocs(
+          query(collection(db, "menu-food"), orderBy("numericId", "asc")),
+        ),
+        getDocs(
+          query(collection(db, "menu-drink"), orderBy("numericId", "asc")),
+        ),
       ]);
 
       const foodData: LinkItem[] = foodSnap.docs
         .map((d) => {
           const x = d.data() as any;
           const numericId = Number(x.numericId ?? d.id);
-          return { numericId, menuType: "food" as const, name: String(x.name ?? "") };
+          return {
+            numericId,
+            menuType: "food" as const,
+            name: String(x.name ?? ""),
+          };
         })
         .filter((x) => Number.isFinite(x.numericId) && x.name);
 
@@ -143,7 +158,11 @@ export default function MenuEditorInner() {
         .map((d) => {
           const x = d.data() as any;
           const numericId = Number(x.numericId ?? d.id);
-          return { numericId, menuType: "drink" as const, name: String(x.name ?? "") };
+          return {
+            numericId,
+            menuType: "drink" as const,
+            name: String(x.name ?? ""),
+          };
         })
         .filter((x) => Number.isFinite(x.numericId) && x.name);
 
@@ -151,7 +170,9 @@ export default function MenuEditorInner() {
       setDrinkItems(drinkData);
     } catch (e) {
       console.error(e);
-      setErr("Non riesco a leggere i dati da Firestore (menu-food / menu-drink).");
+      setErr(
+        "Non riesco a leggere i dati da Firestore (menu-food / menu-drink).",
+      );
     } finally {
       setLoadingList(false);
     }
@@ -187,7 +208,9 @@ export default function MenuEditorInner() {
         setDescription(String(x.description ?? ""));
         setPrice(String(x.price ?? ""));
 
-        setCategory(String(x.category ?? (editType === "food" ? "Panini" : "Cocktail")));
+        setCategory(
+          String(x.category ?? (editType === "food" ? "Panini" : "Cocktail")),
+        );
         setAllergens(Array.isArray(x.allergens) ? x.allergens : []);
 
         setLinkFoodId(x.linkFoodId != null ? String(x.linkFoodId) : "");
@@ -203,10 +226,9 @@ export default function MenuEditorInner() {
     loadEdit();
   }, [isEdit, editType, editId]);
 
-
   function toggleAllergen(code: number) {
     setAllergens((prev) =>
-      prev.includes(code) ? prev.filter((x) => x !== code) : [...prev, code]
+      prev.includes(code) ? prev.filter((x) => x !== code) : [...prev, code],
     );
   }
 
@@ -217,7 +239,7 @@ export default function MenuEditorInner() {
         label: `#${it.numericId} · ${it.name}`,
         key: `food-${it.numericId}`,
       })),
-    [foodItems]
+    [foodItems],
   );
 
   const drinkOptions = useMemo(
@@ -227,7 +249,7 @@ export default function MenuEditorInner() {
         label: `#${it.numericId} · ${it.name}`,
         key: `drink-${it.numericId}`,
       })),
-    [drinkItems]
+    [drinkItems],
   );
 
   async function saveItem() {
@@ -240,7 +262,8 @@ export default function MenuEditorInner() {
     if (!trimmedDesc) return setErr("La descrizione è obbligatoria.");
 
     const priceNum = Number(price.replace(",", ".").trim());
-    if (!Number.isFinite(priceNum)) return setErr("Prezzo non valido (es: 8.50).");
+    if (!Number.isFinite(priceNum))
+      return setErr("Prezzo non valido (es: 8.50).");
     if (priceNum < 0) return setErr("Prezzo non può essere negativo.");
 
     const linkFoodNum = linkFoodId ? toNumberOrNull(linkFoodId) : null;
@@ -267,7 +290,7 @@ export default function MenuEditorInner() {
             linkDrinkId: linkDrinkNum ?? null,
             updatedAt: serverTimestamp(),
           },
-          { merge: true }
+          { merge: true },
         );
 
         setMsg(`Aggiornato ✅ (${editType} #${editId})`);
@@ -281,7 +304,9 @@ export default function MenuEditorInner() {
 
       const newNumericId = await runTransaction(db, async (tx: Transaction) => {
         const counterSnap = await tx.get(counterRef);
-        const current = counterSnap.exists() ? Number(counterSnap.data()?.value ?? 0) : 0;
+        const current = counterSnap.exists()
+          ? Number(counterSnap.data()?.value ?? 0)
+          : 0;
         const next = current + 1;
 
         tx.set(counterRef, { value: next }, { merge: true });
@@ -321,7 +346,7 @@ export default function MenuEditorInner() {
       setErr(
         e?.message?.includes("permission")
           ? "Permesso negato: devi essere autenticata per scrivere su Firestore."
-          : "Errore durante il salvataggio su Firestore."
+          : "Errore durante il salvataggio su Firestore.",
       );
     } finally {
       setSaving(false);
@@ -357,12 +382,18 @@ export default function MenuEditorInner() {
                   <option value="food">Food</option>
                   <option value="drink">Drink</option>
                 </select>
-                {isEdit && <p className={s.hint}>In modifica il tipo è bloccato.</p>}
+                {isEdit && (
+                  <p className={s.hint}>In modifica il tipo è bloccato.</p>
+                )}
               </label>
 
               <label className={s.field}>
                 <span className={s.label}>Tipologia elemento</span>
-                <select className={s.select} value={category} onChange={(e) => setCategory(e.target.value)}>
+                <select
+                  className={s.select}
+                  value={category}
+                  onChange={(e) => setCategory(e.target.value)}
+                >
                   {categories.map((c) => (
                     <option key={c} value={c}>
                       {c}
@@ -373,12 +404,23 @@ export default function MenuEditorInner() {
 
               <label className={`${s.field} ${s.full}`}>
                 <span className={s.label}>Nome</span>
-                <input className={s.input} value={name} onChange={(e) => setName(e.target.value)} placeholder="Es: Negroni Sbajo" />
+                <input
+                  className={s.input}
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="Es: Negroni Sbajo"
+                />
               </label>
 
               <label className={`${s.field} ${s.full}`}>
                 <span className={s.label}>Descrizione / ingredienti</span>
-                <textarea className={s.textarea} value={description} onChange={(e) => setDescription(e.target.value)} rows={4} placeholder="Ingredienti, note, ecc…" />
+                <textarea
+                  className={s.textarea}
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  rows={4}
+                  placeholder="Ingredienti, note, ecc…"
+                />
               </label>
 
               <label className={s.field}>
@@ -389,28 +431,47 @@ export default function MenuEditorInner() {
                     const checked = allergens.includes(code);
 
                     return (
-                      <label key={a.code} className={s.allergenItem} style={{ paddingLeft: 10 }}>
+                      <label
+                        key={a.code}
+                        className={s.allergenItem}
+                        style={{ paddingLeft: 10 }}
+                      >
                         <input
                           type="checkbox"
                           checked={checked}
                           onChange={() => toggleAllergen(code)}
                         />
-                        <span  style={{ paddingLeft: 10 }}>{a.code} · {a.label}</span>
+                        <span style={{ paddingLeft: 10 }}>
+                          {a.code} · {a.label}
+                        </span>
                       </label>
                     );
                   })}
                 </div>
-                <p className={s.hint}>Tip: Ctrl/Cmd per selezionare più voci.</p>
+                <p className={s.hint}>
+                  Tip: Ctrl/Cmd per selezionare più voci.
+                </p>
               </label>
 
               <label className={s.field}>
                 <span className={s.label}>Prezzo</span>
-                <input className={s.input} value={price} onChange={(e) => setPrice(e.target.value)} placeholder="Es: 8.50" inputMode="decimal" />
+                <input
+                  className={s.input}
+                  value={price}
+                  onChange={(e) => setPrice(e.target.value)}
+                  placeholder="Es: 8.50"
+                  inputMode="decimal"
+                />
               </label>
 
               <label className={`${s.field} ${s.full}`}>
                 <span className={s.label}>Collegamento Food (opzionale)</span>
-                <select className={s.select} value={linkFoodId} onChange={(e) => setLinkFoodId(e.target.value)} disabled={loadingList}>
+                <select
+                  className={s.select}
+                  value={linkFoodId}
+                  onChange={(e) => setLinkFoodId(e.target.value)}
+                  disabled={loadingList}
+                >
                   <option value="">Nessuno</option>
                   {foodOptions.map((o) => (
                     <option key={o.key} value={o.value}>
@@ -423,7 +484,12 @@ export default function MenuEditorInner() {
 
               <label className={`${s.field} ${s.full}`}>
                 <span className={s.label}>Collegamento Drink (opzionale)</span>
-                <select className={s.select} value={linkDrinkId} onChange={(e) => setLinkDrinkId(e.target.value)} disabled={loadingList}>
+                <select
+                  className={s.select}
+                  value={linkDrinkId}
+                  onChange={(e) => setLinkDrinkId(e.target.value)}
+                  disabled={loadingList}
+                >
                   <option value="">Nessuno</option>
                   {drinkOptions.map((o) => (
                     <option key={o.key} value={o.value}>
@@ -435,11 +501,24 @@ export default function MenuEditorInner() {
               </label>
 
               <div className={s.actions}>
-                <button type="button" className={`${s.btn} ${s.btnPrimary}`} onClick={saveItem} disabled={saving || loadingEdit}>
-                  {saving ? "Salvataggio…" : isEdit ? "Salva modifiche" : "Salva su Firestore"}
+                <button
+                  type="button"
+                  className={`${s.btn} ${s.btnPrimary}`}
+                  onClick={saveItem}
+                  disabled={saving || loadingEdit}
+                >
+                  {saving
+                    ? "Salvataggio…"
+                    : isEdit
+                      ? "Salva modifiche"
+                      : "Salva su Firestore"}
                 </button>
 
-                <button type="button" className={s.btn} onClick={() => router.push("/admin/table-menu")}>
+                <button
+                  type="button"
+                  className={s.btn}
+                  onClick={() => router.push("/admin/table-menu")}
+                >
                   Vai a table-menu
                 </button>
               </div>

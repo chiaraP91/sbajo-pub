@@ -193,6 +193,7 @@ export default function MenuDrinkClient({
   const GROUP_ORDER = [
     "cocktail",
     "birre",
+    "distillati",
     "vini",
     "soft drink",
     "altro",
