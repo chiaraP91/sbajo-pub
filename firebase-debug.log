@@ -1,0 +1,28 @@
+[debug] [2026-03-19T08:34:24.561Z] ----------------------------------------------------------------------
+[debug] [2026-03-19T08:34:24.565Z] Command:       C:\nvm4w\nodejs\node.exe C:\Users\Chiar\AppData\Roaming\npm\node_modules\firebase-tools\lib\bin\firebase.js deploy --only hosting
+[debug] [2026-03-19T08:34:24.565Z] CLI Version:   13.34.0
+[debug] [2026-03-19T08:34:24.566Z] Platform:      win32
+[debug] [2026-03-19T08:34:24.566Z] Node Version:  v24.14.0
+[debug] [2026-03-19T08:34:24.566Z] Time:          Thu Mar 19 2026 09:34:24 GMT+0100 (Ora standard dell’Europa centrale)
+[debug] [2026-03-19T08:34:24.566Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2026-03-19T08:34:24.773Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2026-03-19T08:34:24.774Z] > authorizing via signed-in user (perottochiara@live.it)
+[debug] [2026-03-19T08:34:24.774Z] [iam] checking project sbajopub for permissions ["firebase.projects.get","firebasehosting.sites.update"]
+[debug] [2026-03-19T08:34:24.774Z] Checked if tokens are valid: true, expires at: 1773912078534
+[debug] [2026-03-19T08:34:24.775Z] Checked if tokens are valid: true, expires at: 1773912078534
+[debug] [2026-03-19T08:34:24.775Z] >>> [apiv2][query] POST https://cloudresourcemanager.googleapis.com/v1/projects/sbajopub:testIamPermissions [none]
+[debug] [2026-03-19T08:34:24.775Z] >>> [apiv2][(partial)header] POST https://cloudresourcemanager.googleapis.com/v1/projects/sbajopub:testIamPermissions x-goog-quota-user=projects/sbajopub
+[debug] [2026-03-19T08:34:24.775Z] >>> [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/sbajopub:testIamPermissions {"permissions":["firebase.projects.get","firebasehosting.sites.update"]}
+[debug] [2026-03-19T08:34:25.361Z] <<< [apiv2][status] POST https://cloudresourcemanager.googleapis.com/v1/projects/sbajopub:testIamPermissions 200
+[debug] [2026-03-19T08:34:25.361Z] <<< [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/sbajopub:testIamPermissions {"permissions":["firebase.projects.get","firebasehosting.sites.update"]}
+[debug] [2026-03-19T08:34:25.361Z] Checked if tokens are valid: true, expires at: 1773912078534
+[debug] [2026-03-19T08:34:25.361Z] Checked if tokens are valid: true, expires at: 1773912078534
+[debug] [2026-03-19T08:34:25.362Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/sbajopub [none]
+[debug] [2026-03-19T08:34:25.788Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/sbajopub 200
+[debug] [2026-03-19T08:34:25.788Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/sbajopub {"projectId":"sbajopub","projectNumber":"276468146568","displayName":"Sbajo Cocktail Bar","name":"projects/sbajopub","resources":{"hostingSite":"sbajopub"},"state":"ACTIVE","etag":"1_ca3d811d-e051-4698-8395-6625a05e4d45"}
+[info] 
+[info] === Deploying to 'sbajopub'...
+[info] 
+[info] i  deploying hosting 
+[info] Running command: npm run build

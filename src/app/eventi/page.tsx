@@ -8,14 +8,14 @@ import EventiClient from "./EventiClient";
 export const dynamic = "force-static";
 
 export const metadata: Metadata = {
-  title: "Eventi a Pomezia | Sbajo Cocktail Bar e Pub",
+  title: "Eventi a Pomezia | Sbajo Cocktail Bar",
   description:
     "Eventi, serate speciali e appuntamenti da Sbajo, cocktail bar e pub a Pomezia. Scopri le prossime serate in programma.",
   keywords:
     "eventi Pomezia, serate Pomezia, pub Pomezia, cocktail bar Pomezia, live music Pomezia, aperitivo Pomezia",
   alternates: { canonical: "https://sbajococktailbar.it/eventi" },
   openGraph: {
-    title: "Eventi a Pomezia | Sbajo Cocktail Bar e Pub",
+    title: "Eventi a Pomezia | Sbajo Cocktail Bar",
     description: "Serate speciali, appuntamenti ed eventi da Sbajo a Pomezia.",
     url: "https://sbajococktailbar.it/eventi",
     type: "website",

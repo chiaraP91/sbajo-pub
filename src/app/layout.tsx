@@ -16,7 +16,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://sbajococktailbar.it"),
-  title: "Sbajo | Cocktail Bar e Pub a Pomezia",
+  title: "Sbajo | Cocktail Bar a Pomezia",
   description:
     "Sbajo e il tuo cocktail bar e pub a Pomezia: aperitivi, cocktail signature, birre, vini, cucina creativa ed eventi. Guarda il menu e prenota il tuo tavolo.",
   keywords:
@@ -50,7 +50,7 @@ export const metadata: Metadata = {
     canonical: "https://sbajococktailbar.it",
   },
   openGraph: {
-    title: "Sbajo | Cocktail Bar e Pub a Pomezia",
+    title: "Sbajo | Cocktail Bar a Pomezia",
     description:
       "Cocktail bar e pub a Pomezia con aperitivi, cucina creativa, drink signature ed eventi. Scopri Sbajo.",
     url: "https://sbajococktailbar.it",
@@ -68,7 +68,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Sbajo | Cocktail Bar e Pub a Pomezia",
+    title: "Sbajo | Cocktail Bar a Pomezia",
     description:
       "Aperitivi, cocktail signature, cucina creativa ed eventi a Pomezia.",
   },

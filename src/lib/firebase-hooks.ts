@@ -1,62 +1,100 @@
-import { useQuery } from "react-query";
+import { useEffect, useState, type DependencyList } from "react";
 import { collection, getDocs, limit, query } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 
+type FirestoreDoc = {
+  id: string;
+  disponibile?: boolean;
+  [key: string]: unknown;
+};
+
+type QueryResult = {
+  data: FirestoreDoc[];
+  isLoading: boolean;
+  error: Error | null;
+};
+
+function useFirestoreCollection(
+  load: () => Promise<FirestoreDoc[]>,
+  deps: DependencyList,
+): QueryResult {
+  const [data, setData] = useState<FirestoreDoc[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const run = async () => {
+      try {
+        const result = await load();
+        if (!cancelled) {
+          setData(result);
+          setError(null);
+        }
+      } catch (err) {
+        if (!cancelled) {
+          setError(
+            err instanceof Error ? err : new Error("Errore caricamento dati"),
+          );
+        }
+      } finally {
+        if (!cancelled) {
+          setIsLoading(false);
+        }
+      }
+    };
+
+    run();
+
+    return () => {
+      cancelled = true;
+    };
+  }, deps);
+
+  return { data, isLoading, error };
+}
+
 // Hook per carica eventi con paginazione e caching
 export function useEventi(pageSize = 10) {
-  return useQuery(
-    ["eventi"],
-    async () => {
-      const q = query(collection(db, "eventi"), limit(pageSize));
-      const snapshot = await getDocs(q);
-      return snapshot.docs.map((doc) => ({
+  return useFirestoreCollection(async () => {
+    const q = query(collection(db, "eventi"), limit(pageSize));
+    const snapshot = await getDocs(q);
+    return snapshot.docs.map(
+      (doc): FirestoreDoc => ({
         id: doc.id,
-        ...doc.data(),
-      }));
-    },
-    {
-      staleTime: 5 * 60 * 1000, // Cache per 5 minuti
-      cacheTime: 10 * 60 * 1000, // Mantieni in memoria per 10 minuti
-    },
-  );
+        ...(doc.data() as Record<string, unknown>),
+      }),
+    );
+  }, [pageSize]);
 }
 
 // Hook per carica menu food con caching
 export function useMenuFood() {
-  return useQuery(
-    ["menu-food"],
-    async () => {
-      const snapshot = await getDocs(collection(db, "menu-food"));
-      return snapshot.docs
-        .map((doc) => ({
+  return useFirestoreCollection(async () => {
+    const snapshot = await getDocs(collection(db, "menu-food"));
+    return snapshot.docs
+      .map(
+        (doc): FirestoreDoc => ({
           id: doc.id,
-          ...doc.data(),
-        }))
-        .filter((item: any) => item.disponibile !== false);
-    },
-    {
-      staleTime: 10 * 60 * 1000, // Cache per 10 minuti
-      cacheTime: 30 * 60 * 1000, // Mantieni in memoria per 30 minuti
-    },
-  );
+          ...(doc.data() as Record<string, unknown>),
+        }),
+      )
+      .filter((item) => item.disponibile !== false);
+  }, []);
 }
 
 // Hook per carica menu drink con caching
 export function useMenuDrink() {
-  return useQuery(
-    ["menu-drink"],
-    async () => {
-      const snapshot = await getDocs(collection(db, "menu-drink"));
-      return snapshot.docs
-        .map((doc) => ({
+  return useFirestoreCollection(async () => {
+    const snapshot = await getDocs(collection(db, "menu-drink"));
+    return snapshot.docs
+      .map(
+        (doc): FirestoreDoc => ({
           id: doc.id,
-          ...doc.data(),
-        }))
-        .filter((item: any) => item.disponibile !== false);
-    },
-    {
-      staleTime: 10 * 60 * 1000, // Cache per 10 minuti
-      cacheTime: 30 * 60 * 1000, // Mantieni in memoria per 30 minuti
-    },
-  );
+          ...(doc.data() as Record<string, unknown>),
+        }),
+      )
+      .filter((item) => item.disponibile !== false);
+  }, []);
 }
