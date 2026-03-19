@@ -16,11 +16,11 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://sbajococktailbar.it"),
-  title: "Sbajo Cocktail Bar | Cocktail, Cucina Creativa, Eventi a Pomezia",
+  title: "Sbajo | Cocktail Bar e Pub a Pomezia",
   description:
-    "Sbajo Cocktail Bar a Pomezia: cocktail con carattere, cucina creativa, eventi sbajati e atmosfera unica. Scopri il nostro menu e prenota online.",
+    "Sbajo e il tuo cocktail bar e pub a Pomezia: aperitivi, cocktail signature, birre, vini, cucina creativa ed eventi. Guarda il menu e prenota il tuo tavolo.",
   keywords:
-    "cocktail bar Pomezia, aperitivo Pomezia, cena Pomezia, eventi Pomezia, cucina creativa, cocktail, birra",
+    "cocktail bar Pomezia, pub Pomezia, aperitivo Pomezia, drink Pomezia, cena Pomezia, eventi Pomezia, birre Pomezia, cucina creativa",
   authors: [{ name: "Sbajo Cocktail Bar" }],
   creator: "Sbajo Cocktail Bar",
   publisher: "Sbajo Cocktail Bar",
@@ -50,9 +50,9 @@ export const metadata: Metadata = {
     canonical: "https://sbajococktailbar.it",
   },
   openGraph: {
-    title: "Sbajo Cocktail Bar | Pomezia",
+    title: "Sbajo | Cocktail Bar e Pub a Pomezia",
     description:
-      "Cocktail con personalità, cucina creativa e serate indimenticabili. Sbajo Cocktail Bar a Pomezia.",
+      "Cocktail bar e pub a Pomezia con aperitivi, cucina creativa, drink signature ed eventi. Scopri Sbajo.",
     url: "https://sbajococktailbar.it",
     type: "website",
     locale: "it_IT",
@@ -68,8 +68,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Sbajo Cocktail Bar",
-    description: "Cocktail, cucina creativa ed eventi sbajati a Pomezia",
+    title: "Sbajo | Cocktail Bar e Pub a Pomezia",
+    description:
+      "Aperitivi, cocktail signature, cucina creativa ed eventi a Pomezia.",
   },
 };
 
@@ -80,16 +81,24 @@ export default function RootLayout({
 }>) {
   const schemaOrg = {
     "@context": "https://schema.org",
-    "@type": "Restaurant",
-    "@id": "https://sbajococktailbar.it",
+    "@type": ["BarOrPub", "Restaurant"],
+    "@id": "https://sbajococktailbar.it/#localbusiness",
     name: "Sbajo Cocktail Bar",
-    description: "Cocktail bar con cucina creativa e eventi sbajati a Pomezia",
+    description:
+      "Cocktail bar e pub a Pomezia con aperitivi, cocktail signature, birre, vini, cucina creativa ed eventi.",
     url: "https://sbajococktailbar.it",
     telephone: "+393333807934",
     priceRange: "€€",
-    servesCuisine: ["Italian", "Creative Cuisine", "Cocktails"],
+    keywords: [
+      "cocktail bar Pomezia",
+      "pub Pomezia",
+      "aperitivo Pomezia",
+      "menu drink Pomezia",
+    ],
+    servesCuisine: ["Italian", "Creative Cuisine"],
     acceptsReservations: true,
     image: "https://sbajococktailbar.it/assets/img/logo3.png",
+    hasMap: "https://www.google.com/maps/search/?api=1&query=SbaJo+Pomezia",
     address: {
       "@type": "PostalAddress",
       streetAddress: "Via Roma",
@@ -98,14 +107,17 @@ export default function RootLayout({
       postalCode: "04011",
       addressCountry: "IT",
     },
+    areaServed: {
+      "@type": "City",
+      name: "Pomezia",
+    },
     geo: {
       "@type": "GeoCoordinates",
       latitude: "41.5954",
       longitude: "12.6535",
     },
     sameAs: [
-      "https://www.instagram.com/sbajococktailbar",
-      "https://www.facebook.com/sbajococktailbar",
+      "https://www.instagram.com/sbajo_cocktail_bar?igsh=ZWs1bTJhN2F0amcz",
     ],
     openingHoursSpecification: [
       {

@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import type { Metadata } from "next";
 import styles from "@/styles/menu.module.scss";
 import Footer from "@/components/Footer";
@@ -21,16 +20,16 @@ const drinkImages = [
 ];
 
 export const metadata: Metadata = {
-  title: "Menu Drink | Sbajo Cocktail Bar - Cocktail, Birre, Vini",
+  title: "Menu Drink | Cocktail Bar e Pub a Pomezia | Sbajo",
   description:
-    "Menu drink esclusivo di Sbajo: cocktail signature, birre artigianali, vini selezionati e soft drink. Scopri le nostre creazioni uniche.",
+    "Scopri il menu drink di Sbajo, cocktail bar e pub a Pomezia: cocktail signature, aperitivi, birre artigianali, vini selezionati e soft drink.",
   keywords:
-    "cocktail Pomezia, birre Pomezia, vini, aperitivo, drink, menu cocktail",
+    "menu drink Pomezia, cocktail bar Pomezia, pub Pomezia, aperitivo Pomezia, cocktail Pomezia, birre Pomezia, vini Pomezia",
   alternates: { canonical: "https://sbajococktailbar.it/menu-drink" },
   openGraph: {
-    title: "Menu Drink | Sbajo Cocktail Bar",
+    title: "Menu Drink | Sbajo Cocktail Bar e Pub a Pomezia",
     description:
-      "Cocktail signature, birre e vini selezionati. Il nostro menu drink esclusivo.",
+      "Cocktail signature, aperitivi, birre e vini selezionati nel menu drink di Sbajo a Pomezia.",
     url: "https://sbajococktailbar.it/menu-drink",
     type: "website",
     locale: "it_IT",

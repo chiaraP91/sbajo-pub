@@ -1,4 +1,4 @@
-@use './variables' as *;
+@use "./variables" as *;
 
 .wrapper {
   display: flex;
@@ -7,20 +7,20 @@
   width: 100%;
   background: $bg-dark;
   color: $gold;
-  overflow: hidden;
+  overflow-x: hidden;
 }
 
 .main {
   flex: 1;
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  padding: 24px 16px;
+  justify-content: flex-start;
+  gap: 24px;
+  padding: 32px 16px 48px;
   width: 100%;
   box-sizing: border-box;
   position: relative;
   min-height: 100vh;
-
 }
 
 .hero {
@@ -37,7 +37,6 @@
   inset: 0;
   z-index: 0;
   height: 120%;
-
 }
 
 .bg {
@@ -47,9 +46,11 @@
   height: 100%;
   object-fit: cover;
   opacity: 0;
-  transition: opacity 900ms ease, transform 6s ease;
+  transition:
+    opacity 900ms ease,
+    transform 6s ease;
   transform: scale(1.05);
-  filter: saturate(.95) contrast(.95) brightness(.9);
+  filter: saturate(0.95) contrast(0.95) brightness(0.9);
 }
 
 .bg.active {
@@ -61,7 +62,9 @@
   position: absolute;
   inset: 0;
   z-index: 1;
-  background:radial-gradient(120% 80% at 50% 100%, #00000038 0%, #00000038 70%), linear-gradient(to top, #0000003b 0, #0003 60%, #0000002e 100%);
+  background:
+    radial-gradient(120% 80% at 50% 100%, #00000038 0%, #00000038 70%),
+    linear-gradient(to top, #0000003b 0, #0003 60%, #0000002e 100%);
   backdrop-filter: blur(1px);
 }
 
@@ -70,24 +73,24 @@
   z-index: 2;
   padding: 24px 16px 12px;
   max-width: 1100px;
+  width: 100%;
 }
 
 .logo {
-  font-family: 'Spectral', serif;
+  font-family: "Spectral", serif;
   font-weight: 600;
   font-size: clamp(44px, 10vw, 96px);
   line-height: 1;
-  letter-spacing: .5px;
+  letter-spacing: 0.5px;
   margin: 0 0 8px;
 }
 
 .tagline {
-  font-family: 'Spectral', serif;
+  font-family: "Spectral", serif;
   font-size: clamp(16px, 2.5vw, 28px);
   color: $gold-strong;
   margin: 0 0 6dvh;
 }
-
 
 .actions {
   width: min(420px, 88vw);
@@ -99,13 +102,44 @@
   z-index: 2;
 }
 
-
 .content {
   position: relative;
   z-index: 2;
   align-self: center;
+  display: grid;
+  justify-items: center;
+  gap: 16px;
 }
 
+.heroCopy {
+  display: grid;
+  gap: 10px;
+  max-width: 760px;
+  text-align: center;
+}
+
+.eyebrow {
+  margin: 0;
+  font-size: 12px;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: rgba(224, 194, 126, 0.84);
+}
+
+.heroTitle {
+  margin: 0;
+  font-family: "Spectral", serif;
+  font-size: clamp(32px, 5.8vw, 58px);
+  line-height: 1.02;
+  color: #f2dfb0;
+}
+
+.heroLead {
+  margin: 0;
+  font-size: clamp(15px, 2.1vw, 20px);
+  line-height: 1.65;
+  color: rgba(255, 247, 225, 0.9);
+}
 
 .pillBtn {
   display: grid;
@@ -113,25 +147,28 @@
   height: 54px;
   border-radius: 10px;
   text-decoration: none;
-  font-family: 'Spectral', serif;
+  font-family: "Spectral", serif;
   font-size: 22px;
-  letter-spacing: .3px;
+  letter-spacing: 0.3px;
   width: 100%; // oppure 92% se li vuoi più “aria”
 
   color: $gold;
-  background: rgba(0,0,0,.18);
-  border: 1.5px solid rgba(221, 187, 121, .85); // oro “outline”
+  background: rgba(0, 0, 0, 0.18);
+  border: 1.5px solid rgba(221, 187, 121, 0.85); // oro “outline”
   box-shadow:
-    0 10px 26px rgba(0,0,0,.45),
-    inset 0 1px 0 rgba(255,255,255,.04);
+    0 10px 26px rgba(0, 0, 0, 0.45),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
 
-  transition: transform .18s ease, background .18s ease, border-color .18s ease;
+  transition:
+    transform 0.18s ease,
+    background 0.18s ease,
+    border-color 0.18s ease;
 }
 
 .pillBtn:hover,
 .pillBtn:focus-visible {
   transform: translateY(-2px);
-  background: rgba(0,0,0,.28);
+  background: rgba(0, 0, 0, 0.28);
   border-color: $gold;
 }
 
@@ -158,19 +195,19 @@
   gap: 12px;
   padding: 14px;
   border-radius: 18px;
-  width:  -webkit-fill-available;
-  background: rgba(0, 0, 0, .38);
-  border: 1px solid rgba(221, 187, 121, .22);
+  width: -webkit-fill-available;
+  background: rgba(0, 0, 0, 0.38);
+  border: 1px solid rgba(221, 187, 121, 0.22);
   box-shadow:
-    0 18px 60px rgba(0,0,0,.55),
-    inset 0 1px 0 rgba(255,255,255,.06);
+    0 18px 60px rgba(0, 0, 0, 0.55),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
 
   backdrop-filter: blur(10px);
 }
 
 .actionBtn {
-      display: flex;
-    justify-content: space-between;
+  display: flex;
+  justify-content: space-between;
 
   grid-template-columns: 40px 1fr 24px;
   align-items: center;
@@ -182,29 +219,29 @@
   text-decoration: none;
 
   color: $gold;
-  background: rgba(0,0,0,.28);
-  border: 1.5px solid rgba(221, 187, 121, .55);
+  background: rgba(0, 0, 0, 0.28);
+  border: 1.5px solid rgba(221, 187, 121, 0.55);
 
   box-shadow:
-    0 10px 24px rgba(0,0,0,.45),
-    inset 0 1px 0 rgba(255,255,255,.05);
+    0 10px 24px rgba(0, 0, 0, 0.45),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
 
   transition:
-    transform .16s ease,
-    background .16s ease,
-    border-color .16s ease,
-    box-shadow .16s ease;
+    transform 0.16s ease,
+    background 0.16s ease,
+    border-color 0.16s ease,
+    box-shadow 0.16s ease;
 }
 
 .actionBtn:hover,
 .actionBtn:focus-visible {
   transform: translateY(-2px);
-  background: rgba(0,0,0,.36);
-  border-color: rgba(221, 187, 121, .92);
+  background: rgba(0, 0, 0, 0.36);
+  border-color: rgba(221, 187, 121, 0.92);
   box-shadow:
-    0 16px 34px rgba(0,0,0,.55),
-    0 0 0 3px rgba(221,187,121,.10),
-    inset 0 1px 0 rgba(255,255,255,.06);
+    0 16px 34px rgba(0, 0, 0, 0.55),
+    0 0 0 3px rgba(221, 187, 121, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
 }
 
 .actionIcon {
@@ -214,24 +251,26 @@
   place-items: center;
   border-radius: 10px;
 
-  background: rgba(221,187,121,.08);
-  border: 1px solid rgba(221,187,121,.18);
+  background: rgba(221, 187, 121, 0.08);
+  border: 1px solid rgba(221, 187, 121, 0.18);
 
   filter: saturate(1.05);
 }
 
 .actionText {
-  font-family: 'Spectral', serif;
+  font-family: "Spectral", serif;
   font-size: 22px;
-  letter-spacing: .3px;
+  letter-spacing: 0.3px;
 }
 
 .actionArrow {
   justify-self: end;
   font-size: 26px;
-  opacity: .85;
+  opacity: 0.85;
   transform: translateX(-2px);
-  transition: transform .16s ease, opacity .16s ease;
+  transition:
+    transform 0.16s ease,
+    opacity 0.16s ease;
 }
 
 .actionBtn:hover .actionArrow,
@@ -244,7 +283,119 @@
   inset: 0;
   z-index: 1;
   background:
-    radial-gradient(120% 90% at 50% 100%, rgba(0,0,0,.18) 0%, rgba(0,0,0,.55) 70%),
-    linear-gradient(to top, rgba(0,0,0,.55) 0, rgba(0,0,0,.25) 55%, rgba(0,0,0,.40) 100%);
+    radial-gradient(
+      120% 90% at 50% 100%,
+      rgba(0, 0, 0, 0.18) 0%,
+      rgba(0, 0, 0, 0.55) 70%
+    ),
+    linear-gradient(
+      to top,
+      rgba(0, 0, 0, 0.55) 0,
+      rgba(0, 0, 0, 0.25) 55%,
+      rgba(0, 0, 0, 0.4) 100%
+    );
   backdrop-filter: blur(1px);
+}
+
+.seoSection {
+  position: relative;
+  z-index: 2;
+  width: min(1120px, 100%);
+  align-self: center;
+}
+
+.seoPanel {
+  display: grid;
+  gap: 18px;
+  padding: 22px;
+  border-radius: 24px;
+  background: linear-gradient(
+    180deg,
+    rgba(16, 21, 19, 0.86) 0%,
+    rgba(7, 10, 9, 0.9) 100%
+  );
+  border: 1px solid rgba(221, 187, 121, 0.2);
+  box-shadow:
+    0 20px 60px rgba(0, 0, 0, 0.42),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(12px);
+}
+
+.sectionKicker {
+  margin: 0;
+  font-size: 13px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(224, 194, 126, 0.78);
+}
+
+.sectionTitle {
+  margin: 0;
+  font-family: "Spectral", serif;
+  font-size: clamp(26px, 4vw, 40px);
+  line-height: 1.1;
+  color: #f3e5bd;
+}
+
+.sectionText {
+  margin: 0;
+  max-width: 860px;
+  font-size: 16px;
+  line-height: 1.75;
+  color: rgba(255, 247, 225, 0.88);
+}
+
+.featureGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 14px;
+}
+
+.featureCard {
+  display: grid;
+  gap: 10px;
+  padding: 18px;
+  border-radius: 18px;
+  background: rgba(0, 0, 0, 0.24);
+  border: 1px solid rgba(221, 187, 121, 0.18);
+}
+
+.featureTitle {
+  margin: 0;
+  font-family: "Spectral", serif;
+  font-size: 24px;
+  color: #f0ddb1;
+}
+
+.featureText {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.7;
+  color: rgba(255, 247, 225, 0.84);
+}
+
+.featureLink {
+  color: $gold-strong;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.featureLink:hover,
+.featureLink:focus-visible {
+  text-decoration: underline;
+}
+
+@media (max-width: 768px) {
+  .main {
+    gap: 20px;
+    padding: 24px 14px 40px;
+  }
+
+  .seoPanel {
+    padding: 18px;
+  }
+
+  .featureGrid {
+    grid-template-columns: 1fr;
+  }
 }

@@ -7,15 +7,18 @@ import Footer from "@/components/Footer";
 import styles from "@/styles/home.module.scss";
 
 export const metadata: Metadata = {
-  title: "Sbajo Cocktail Bar | Pomezia",
+  title: "Sbajo | Cocktail Bar e Pub a Pomezia",
   description:
-    "Cocktail bar e cucina creativa. Scopri menu, eventi e l’anima di Sbajo.",
+    "Sbajo e un cocktail bar e pub a Pomezia dove trovare aperitivi, cocktail signature, birre, vini, cucina creativa ed eventi. Scopri menu e prenotazioni.",
+  keywords:
+    "cocktail bar Pomezia, pub Pomezia, aperitivo Pomezia, drink Pomezia, menu cocktail Pomezia, pub con cucina Pomezia",
   alternates: { canonical: "https://sbajococktailbar.it/" },
   openGraph: {
-    title: "Sbajo Cocktail Bar",
-    description: "Cocktail, cucina creativa ed eventi.",
+    title: "Sbajo | Cocktail Bar e Pub a Pomezia",
+    description:
+      "Cocktail bar e pub a Pomezia con aperitivi, cucina creativa ed eventi.",
     url: "https://sbajococktailbar.it/",
-    siteName: "Sbajo",
+    siteName: "Sbajo Cocktail Bar",
     locale: "it_IT",
     type: "website",
   },

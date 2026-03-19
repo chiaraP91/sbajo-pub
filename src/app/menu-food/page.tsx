@@ -15,15 +15,16 @@ const foodImages = [
 ];
 
 export const metadata: Metadata = {
-  title: "Menu Food | Sbajo Cocktail Bar - Cucina Creativa, Burger, Dolci",
+  title: "Menu Food | Pub e Cocktail Bar a Pomezia | Sbajo",
   description:
-    "Menu food di Sbajo: piatti creativi, burger gourmet, dolci homemade e appetizer sfiziosissimi. Scopri la cucina creativa a Pomezia.",
-  keywords: "cucina creativa Pomezia, burger Pomezia, dolci, cena, menu, food",
+    "Menu food di Sbajo a Pomezia: cucina creativa, burger gourmet, appetizer e dolci homemade per aperitivo e cena.",
+  keywords:
+    "menu food Pomezia, pub Pomezia con cucina, cocktail bar Pomezia, cucina creativa Pomezia, burger Pomezia, cena Pomezia",
   alternates: { canonical: "https://sbajococktailbar.it/menu-food" },
   openGraph: {
-    title: "Menu Food | Sbajo Cocktail Bar",
+    title: "Menu Food | Sbajo Pub e Cocktail Bar a Pomezia",
     description:
-      "Cucina creativa e piatti gourmet. Scopri il nostro menu food esclusivo.",
+      "Cucina creativa e piatti gourmet per aperitivo e cena da Sbajo a Pomezia.",
     url: "https://sbajococktailbar.it/menu-food",
     type: "website",
     locale: "it_IT",
