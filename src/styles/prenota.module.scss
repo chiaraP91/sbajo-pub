@@ -1,4 +1,4 @@
-@use './variables' as *;
+@use "./variables" as *;
 
 .wrapper {
   position: relative;
@@ -8,8 +8,8 @@
   overflow: hidden;
   background: $bg-dark;
   color: $gold;
-  font-family: 'Spectral', serif;
-  align-items: center;  // Centra il contenuto orizzontalmente
+  font-family: "Spectral", serif;
+  align-items: center; // Centra il contenuto orizzontalmente
   justify-content: center; // Centra il contenuto verticalmente
 }
 
@@ -27,7 +27,9 @@
   height: 100%;
   object-fit: cover;
   opacity: 0;
-  transition: opacity 900ms ease, transform 6s ease;
+  transition:
+    opacity 900ms ease,
+    transform 6s ease;
   transform: scale(1.05);
   filter: saturate(0.95) contrast(0.95) brightness(0.9);
 }
@@ -62,7 +64,9 @@
   margin-bottom: 20px;
   color: $gold;
   text-align: center;
-  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.6), 0 4px 20px rgba(0, 0, 0, 0.4);
+  text-shadow:
+    0 1px 0 rgba(0, 0, 0, 0.6),
+    0 4px 20px rgba(0, 0, 0, 0.4);
 }
 
 .formGroup {
@@ -87,14 +91,14 @@
   transition: all 0.3s ease;
 
   line-height: 1.2;
-  height: 54px;          // <<< forza altezza uguale per tutti
+  height: 54px; // <<< forza altezza uguale per tutti
   box-sizing: border-box;
 }
 
 /* SOLO iOS: date/time a volte diventano più alti */
 .formInput[type="date"],
 .formInput[type="time"] {
-  padding: 0 12px;       // <<< niente padding verticale gigante
+  padding: 0 12px; // <<< niente padding verticale gigante
   -webkit-appearance: none;
   appearance: none;
 }
@@ -111,7 +115,6 @@
   opacity: 0.8;
   cursor: pointer;
 }
-
 
 .formInput:focus {
   border-color: $gold-strong;
@@ -152,17 +155,50 @@ textarea.formInput {
   }
 }
 
-
 .prenotaButton:disabled {
-  background-color: #888; 
+  background-color: #888;
   cursor: not-allowed;
 }
 
+.privacyBox {
+  margin-top: 16px;
+  border: 1px solid rgba(215, 181, 109, 0.35);
+  border-radius: 10px;
+  padding: 12px;
+  background: rgba(0, 0, 0, 0.35);
+
+  p {
+    margin: 10px 0 0;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  a {
+    color: $gold-strong;
+    text-underline-offset: 3px;
+  }
+}
+
+.privacyCheck {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  font-size: 15px;
+  line-height: 1.45;
+
+  input {
+    margin-top: 2px;
+  }
+}
+
+.formNote {
+  margin-top: 14px;
+}
 
 .modalOverlay {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.55);
+  background: rgba(0, 0, 0, 0.55);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -177,7 +213,7 @@ textarea.formInput {
   width: 90%;
   max-width: 380px;
   text-align: center;
-  border: 1px solid rgba(215,181,109,0.3);
+  border: 1px solid rgba(215, 181, 109, 0.3);
 }
 
 .modalButtons {
@@ -190,7 +226,7 @@ textarea.formInput {
 .modalPrimary,
 .modalSecondary,
 .modalCall {
-  padding: .8rem 1.2rem;
+  padding: 0.8rem 1.2rem;
   border-radius: 10px;
   font-size: 1rem;
   text-decoration: none;
@@ -219,7 +255,6 @@ textarea.formInput {
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
 }
-
 
 .wrapper {
   min-height: 100dvh;

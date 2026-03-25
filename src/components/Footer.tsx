@@ -1,14 +1,17 @@
-import styles from '@/styles/footer.module.scss';
-import Link from 'next/link';
+import styles from "@/styles/footer.module.scss";
+import Link from "next/link";
 
 export default function Footer() {
   return (
     <footer className={styles.footer}>
       <nav className={styles.footerNav}>
-
-      <Link href="/prenota" className={styles.footerLink}>
-          <img src="/assets/img/icona1.png" alt="Prenota" className={styles.footerIcon} />
-          <span className='flex'>Prenota</span>
+        <Link href="/prenota" className={styles.footerLink}>
+          <img
+            src="/assets/img/icona1.png"
+            alt="Prenota"
+            className={styles.footerIcon}
+          />
+          <span className="flex">Prenota</span>
         </Link>
 
         {/* MAPS */}
@@ -42,14 +45,22 @@ export default function Footer() {
           />
           <span>Instagram</span>
         </a>
-
       </nav>
+
+      <div className={styles.legalLinks}>
+        <Link href="/privacy-policy" className={styles.legalLink}>
+          Privacy Policy
+        </Link>
+        <Link href="/cookie-policy" className={styles.legalLink}>
+          Cookie Policy
+        </Link>
+      </div>
 
       <div className={styles.signature}>
         <span>Spazio web realizzato da: GaIA Software Studio per lo </span>
         <span>
-          Sbajo di Silvio Falcone{' '}
-          <span style={{ textDecoration: 'underline' }}>
+          Sbajo di Silvio Falcone{" "}
+          <span style={{ textDecoration: "underline" }}>
             P. IVA: 18271391007
           </span>
         </span>
