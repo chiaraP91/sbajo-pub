@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import Script from "next/script";
 import CanonicalTag from "@/components/CanonicalTag";
-import CookieBanner from "@/components/CookieBanner";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -161,7 +160,6 @@ export default function RootLayout({
         {/* Canonical Tag per multi-dominio SEO - Client Component */}
         <CanonicalTag />
         {children}
-        <CookieBanner />
       </body>
     </html>
   );
