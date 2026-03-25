@@ -38,11 +38,10 @@ export default function CookiePolicyPage() {
         </section>
 
         <section className={styles.section}>
-          <h2>Cookie analytics (Google Analytics)</h2>
+          <h2>Cookie analytics e di profilazione</h2>
           <p>
-            Google Analytics viene attivato solo dopo consenso esplicito tramite
-            banner cookie. In assenza di consenso, i cookie analytics restano
-            bloccati.
+            Al momento questo sito non utilizza cookie analytics o cookie di
+            profilazione.
           </p>
         </section>
 
