@@ -12,6 +12,9 @@ const CONSENT_KEY = "sbajo_cookie_consent_v1";
 const measurementId = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
 
 function getSavedConsent(): ConsentState | null {
+  if (typeof window === "undefined") {
+    return null;
+  }
   const saved = localStorage.getItem(CONSENT_KEY);
   if (saved === "granted" || saved === "denied") {
     return saved;
